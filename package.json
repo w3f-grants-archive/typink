@@ -1,0 +1,32 @@
+{
+  "name": "typink.dev",
+  "private": true,
+  "author": "Thang X. Vu <thang@coongcrafts.io>",
+  "packageManager": "yarn@4.3.1",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && npx lerna run build --no-private",
+    "clean": "npx lerna run clean",
+    "test": "npx lerna run --no-bail --verbose test",
+    "prettify": "npx prettier --write \"{packages,scripts}/{**/*,*}.{js,ts,jsx,tsx,json,mjs}\"",
+    "check-format": "npx prettier --check \"{packages,scripts}/{**/*,*}.{js,ts,jsx,tsx,json,mjs}\"",
+    "prepublishOnly": "yarn copy-files-to-dist",
+    "postinstall": "husky install",
+    "copy-files-to-dist": "npx lerna exec --no-private -- npx ts-node \\$LERNA_ROOT_PATH/scripts/copy-files-to-dist.ts",
+    "publish:next": "yarn gen && yarn build && npx lerna publish prerelease --canary --preid next.$(git rev-parse --short=8 HEAD) --dist-tag next --force-publish --no-private --no-git-tag-version --yes",
+    "publish:pre": "yarn gen && yarn build && npx lerna publish prerelease -m \"chore(release): publish %s - [skip ci]\" --force-publish --no-private",
+    "publish:minor": "yarn gen && yarn build && npx lerna publish minor -m \"chore(release): publish %s - [skip ci]\" --force-publish --no-private"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "husky": "^8.0.3",
+    "lerna": "^7.4.2",
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "license": "MIT"
+}
