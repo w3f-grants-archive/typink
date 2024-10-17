@@ -14,10 +14,6 @@ const main = () => {
   filesToCopy.forEach((file) => {
     let filePath = path.resolve(currentDir, file);
 
-    if (!currentDir.endsWith('packages/chaintypes')) {
-      return;
-    }
-
     // Copy the root README.md if current dir
     if (file === 'README.md') {
       filePath = path.resolve(currentDir, '../..', file);
