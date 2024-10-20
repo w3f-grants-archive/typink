@@ -4,7 +4,8 @@
   "author": "Thang X. Vu <thang@coongcrafts.io>",
   "packageManager": "yarn@4.3.1",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "scripts": {
     "build": "yarn clean && npx lerna run build --no-private",
@@ -14,6 +15,7 @@
     "check-format": "npx prettier --check \"{packages,scripts}/{**/*,*}.{js,ts,jsx,tsx,json,mjs}\"",
     "prepublishOnly": "yarn copy-files-to-dist",
     "postinstall": "husky install",
+    "fix-esm-path": "npx tsc-esm-fix --src=packages --ext=.js",
     "copy-files-to-dist": "npx lerna exec --no-private -- npx ts-node \\$LERNA_ROOT_PATH/scripts/copy-files-to-dist.ts",
     "publish:next": "yarn build && npx lerna publish prerelease --canary --preid next.$(git rev-parse --short=8 HEAD) --dist-tag next --force-publish --no-private --no-git-tag-version",
     "publish:pre": "yarn build && npx lerna publish prerelease -m \"chore(release): publish %s - [skip ci]\" --force-publish --no-private",
@@ -26,6 +28,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^3.2.3",
     "ts-node": "^10.9.1",
+    "tsc-esm-fix": "^2.20.27",
     "typescript": "^5.2.2"
   },
   "engines": {
