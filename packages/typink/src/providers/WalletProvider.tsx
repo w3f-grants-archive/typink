@@ -6,13 +6,14 @@ import { InjectedAccount, Props } from '../types.js';
 import { Wallet } from '../wallets/index.js';
 
 export interface WalletContextProps {
-  accounts: InjectedAccount[];
-  injectedApi?: Injected;
   enableWallet: (id: string) => void;
   signOut: () => void;
   availableWallets: Wallet[];
   connectedWalletId?: string;
   connectedWallet?: Wallet;
+
+  accounts: InjectedAccount[];
+  injectedApi?: Injected;
   selectedAccount?: InjectedAccount;
   setSelectedAccount: (account: InjectedAccount) => void;
 }
@@ -29,7 +30,9 @@ export const useWalletContext = () => {
   return useContext(WalletContext);
 };
 
-export function WalletProvider({ children }: Props) {
+export interface WalletProviderProps extends Props {}
+
+export function WalletProvider({ children }: WalletProviderProps) {
   const availableWallets = useWallets();
   const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
   const [injectedApi, setInjectedApi] = useState<Injected>();

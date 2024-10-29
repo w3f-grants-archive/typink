@@ -80,8 +80,7 @@ export async function contractTx<
     callback?: (result: ISubmittableResult) => void;
   } & Args<Pop<Parameters<T['tx'][M]>>>,
 ): Promise<void> {
-  // assertions
-
+  // TODO assertions
   // TODO check if balance is sufficient
 
   const defer = deferred<void>();

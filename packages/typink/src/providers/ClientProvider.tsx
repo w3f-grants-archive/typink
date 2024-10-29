@@ -38,6 +38,7 @@ export function ClientProvider({ children, defaultNetworkId = DEFAULT_NETWORK }:
   const [networkId, setNetworkId] = useLocalStorage<string>('SELECTED_NETWORK_ID', defaultNetworkId);
   const network = useMemo(() => SUPPORTED_NETWORKS[networkId!], [networkId]);
 
+  // TODO supports multi clients
   const { ready, client } = useClient(network);
 
   useEffect(() => {

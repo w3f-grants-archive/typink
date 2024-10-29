@@ -1,30 +1,43 @@
 import { useState } from 'react';
 import { useAsync } from 'react-use';
 import { useTypink } from '../providers/index.js';
-import { Contract, GenericContractApi } from 'dedot/contracts';
+import { Contract, ExecutionOptions, GenericContractApi } from 'dedot/contracts';
+import { TypinkError } from '../utils/index.js';
 
-export function useContract<T extends GenericContractApi = GenericContractApi>(contractId: string) {
-  const { deployments } = useTypink();
-  const { client, network } = useTypink();
+export type UseContract<T extends GenericContractApi = GenericContractApi> = {
+  contract?: Contract<T>;
+};
+
+export function useContract<T extends GenericContractApi = GenericContractApi>(
+  contractId: string,
+  options: ExecutionOptions = {},
+): UseContract<T> {
+  const { deployments, client, network, selectedAccount, defaultCaller } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
   useAsync(async () => {
     if (!client || !network) {
-      if (contract) {
-        setContract(undefined);
-      }
-
+      setContract(undefined);
       return;
     }
 
     const deployment = deployments.find((d) => d.id === contractId && d.network === network.id);
     if (!deployment) {
-      console.error(`Contract deployment with id: ${contractId} not found on network: ${network.id}`);
-      return;
+      throw new TypinkError(`Contract deployment with id: ${contractId} not found on network: ${network.id}`);
     }
 
-    setContract(new Contract<T>(client, deployment.metadata, deployment.address));
-  }, [client, network]);
+    const contract = new Contract<T>(
+      client,
+      deployment.metadata,
+      deployment.address, // prettier-end-here
+      {
+        defaultCaller: selectedAccount?.address || defaultCaller,
+        ...options,
+      },
+    );
+
+    setContract(contract);
+  }, [client, network, selectedAccount]);
 
   return {
     contract,

@@ -24,22 +24,21 @@ export function useContractQuery<
   parameters: {
     contract: Contract<T> | undefined;
     fn: M;
+    options?: ContractCallOptions
   } & Args<Pop<Parameters<T['query'][M]>>>,
 ): UseContractQueryReturnType<T, M> {
-  const { defaultCaller } = useTypink();
+  // TODO replace loading tracking state with tanstack
   const [isLoading, setIsLoading] = useBoolean(true);
   const [result, setResult] = useState<any>();
   const { refresh, refreshCounter } = useRefresher();
 
-  const { contract, fn, args = [] } = parameters;
+  const { contract, fn, args = [], options } = parameters;
 
   useDeepCompareEffect(() => {
     (async () => {
       if (!contract || !fn || !args) return;
 
-      const callOptions: ContractCallOptions = { caller: defaultCaller };
-
-      const result = await contract.query[fn](...args, callOptions);
+      const result = await contract.query[fn](...args, options);
       setResult(result);
       setIsLoading(false);
     })();

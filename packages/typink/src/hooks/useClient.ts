@@ -5,19 +5,24 @@ import { DedotClient, ISubstrateClient, JsonRpcProvider, LegacyClient, WsProvide
 import { SubstrateApi } from 'dedot/chaintypes';
 import { RpcVersion } from 'dedot/types';
 
-type UseApi = {
+export type CompatibleSubstrateClient = ISubstrateClient<SubstrateApi[RpcVersion]>;
+
+export type UseApi = {
   ready: boolean;
-  client?: ISubstrateClient<SubstrateApi[RpcVersion]>;
+  client?: CompatibleSubstrateClient;
 };
 
 export function useClient(network?: NetworkInfo): UseApi {
-  const [cacheMetadata] = useLocalStorage<boolean>('SETTINGS/CACHE_METADATA', true);
+  // TODO review this again, we should expose & let end-user customize this
+  const [cacheMetadata] = useLocalStorage<boolean>('TYPINK/SETTINGS/CACHE_METADATA', true);
 
   const [ready, setReady] = useToggle(false);
-  const [client, setClient] = useState<ISubstrateClient<SubstrateApi[RpcVersion]>>();
+  const [client, setClient] = useState<CompatibleSubstrateClient>();
 
   useAsync(async () => {
     if (!network) {
+      setClient(undefined);
+      setReady(false);
       return;
     }
 
@@ -26,10 +31,6 @@ export function useClient(network?: NetworkInfo): UseApi {
     }
 
     setReady(false);
-
-    // TODO might be not a good idea to put the toast here,
-    //  but it's okay for now for demo purposes!
-    // const toastId = toast.info(`Connecting to ${network.name}`, { autoClose: false, isLoading: true });
 
     const provider: JsonRpcProvider = new WsProvider(network.provider);
 
@@ -42,13 +43,7 @@ export function useClient(network?: NetworkInfo): UseApi {
 
     setReady(true);
 
-    // TODO emit event or smt?
-    // toast.update(toastId, {
-    //   render: `Connected to ${network.name}`,
-    //   autoClose: 2000,
-    //   isLoading: false,
-    //   type: 'success',
-    // });
+    // TODO emit connected event or smt?
   }, [network?.provider]);
 
   return { ready, client };

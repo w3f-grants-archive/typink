@@ -6,11 +6,16 @@ import {
   useClientContext,
 } from '../providers/ClientProvider.js';
 import { useWalletContext, WalletContextProps, WalletProvider } from '../providers/WalletProvider.js';
-import { ContractDeployment } from '../types.js';
+import { ContractDeployment, SubstrateAddress } from '../types.js';
 
 interface TypinkContextProps extends ClientContextProps, WalletContextProps {
   deployments: ContractDeployment[];
-  defaultCaller: string;
+  // TODO validate substrate address
+  defaultCaller: SubstrateAddress;
+
+
+  // TODO list of networks to connect
+  // TODO lazy options
 }
 
 export const TypinkContext = createContext<TypinkContextProps>({} as any);
