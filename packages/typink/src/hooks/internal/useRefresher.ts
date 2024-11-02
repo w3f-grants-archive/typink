@@ -7,5 +7,5 @@ export function useRefresher() {
     setCounter((counter) => counter + 1);
   };
 
-  return { refresh, refreshCounter: counter };
+  return { refresh, counter };
 }

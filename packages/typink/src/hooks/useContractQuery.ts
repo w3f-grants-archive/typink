@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useBoolean, useDeepCompareEffect } from 'react-use';
-import { useRefresher } from './useRefresher.js';
-import { useTypink } from './useTypink.js';
+import { useRefresher } from './internal/index.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import { Contract, ContractCallOptions, GenericContractApi } from 'dedot/contracts';
 
@@ -24,13 +23,13 @@ export function useContractQuery<
   parameters: {
     contract: Contract<T> | undefined;
     fn: M;
-    options?: ContractCallOptions
+    options?: ContractCallOptions;
   } & Args<Pop<Parameters<T['query'][M]>>>,
 ): UseContractQueryReturnType<T, M> {
   // TODO replace loading tracking state with tanstack
   const [isLoading, setIsLoading] = useBoolean(true);
   const [result, setResult] = useState<any>();
-  const { refresh, refreshCounter } = useRefresher();
+  const { refresh, counter } = useRefresher();
 
   const { contract, fn, args = [], options } = parameters;
 
@@ -42,7 +41,7 @@ export function useContractQuery<
       setResult(result);
       setIsLoading(false);
     })();
-  }, [contract, fn, args, refreshCounter]);
+  }, [contract, fn, args, counter]);
 
   return {
     isLoading,

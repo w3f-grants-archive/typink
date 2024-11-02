@@ -5,7 +5,6 @@ export * from './useContract.js';
 export * from './useContractQuery.js';
 export * from './useContractTx.js';
 export * from './useRawContract.js';
-export * from './useRefresher.js';
 export * from './useWallets.js';
 export * from './useWatchContractEvent.js';
 export * from './useTypink.js';
