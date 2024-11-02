@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useTypink } from '../hooks/index.js';
+import { useTypink } from './useTypink.js';
 import { OmitNever } from '../types.js';
 import { Contract, GenericContractApi } from 'dedot/contracts';
 import { Unsub } from 'dedot/types';

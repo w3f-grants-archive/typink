@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAsync } from 'react-use';
-import { useTypink } from '../hooks/index.js';
+import { useTypink } from './useTypink.js';
 import { Contract, ExecutionOptions, GenericContractApi } from 'dedot/contracts';
 import { TypinkError } from '../utils/index.js';
 

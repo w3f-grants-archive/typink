@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAsync } from 'react-use';
-import { useTypink } from '../hooks/index.js';
+import { useTypink } from './useTypink.js';
 import { Contract, ContractMetadata, GenericContractApi } from 'dedot/contracts';
 
 export function useRawContract<T extends GenericContractApi = GenericContractApi>(

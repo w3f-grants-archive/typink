@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useBoolean, useDeepCompareEffect } from 'react-use';
 import { useRefresher } from './useRefresher.js';
-import { useTypink } from '../hooks/index.js';
+import { useTypink } from './useTypink.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import { Contract, ContractCallOptions, GenericContractApi } from 'dedot/contracts';
 
