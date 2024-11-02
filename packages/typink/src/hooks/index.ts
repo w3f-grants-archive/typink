@@ -1,6 +1,6 @@
+export * from './internal/index.js';
 export * from './useBalance.js';
 export * from './useBalances.js';
-export * from './useClient.js';
 export * from './useContract.js';
 export * from './useContractQuery.js';
 export * from './useContractTx.js';

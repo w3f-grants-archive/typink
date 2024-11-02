@@ -13,7 +13,6 @@ export interface TypinkContextProps extends ClientContextProps, WalletContextPro
   // TODO validate substrate address
   defaultCaller: SubstrateAddress;
 
-
   // TODO list of networks to connect
   // TODO lazy options
 }
@@ -36,10 +35,16 @@ function TypinkProviderWrapper({ children, deployments, defaultCaller }: TypinkP
   );
 }
 
-export function TypinkProvider({ children, deployments, defaultCaller, defaultNetworkId }: TypinkProviderProps) {
+export function TypinkProvider({
+  children,
+  deployments,
+  defaultCaller,
+  defaultNetworkId,
+  cacheMetadata = false,
+}: TypinkProviderProps) {
   return (
     <WalletProvider>
-      <ClientProvider defaultNetworkId={defaultNetworkId}>
+      <ClientProvider defaultNetworkId={defaultNetworkId} cacheMetadata={cacheMetadata}>
         <TypinkProviderWrapper deployments={deployments} defaultCaller={defaultCaller}>
           {children}
         </TypinkProviderWrapper>

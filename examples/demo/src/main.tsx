@@ -9,20 +9,28 @@ import { NetworkId, TypinkProvider } from 'typink';
 
 const DEFAULT_CALLER = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Alice
 
+function Root() {
+  return (
+    <ChakraProvider theme={theme}>
+      <TypinkProvider
+        deployments={deployments}
+        defaultCaller={DEFAULT_CALLER}
+        defaultNetworkId={NetworkId.POP_TESTNET}
+        cacheMetadata={true}>
+        <App />
+        <ToastContainer
+          position='top-right'
+          closeOnClick
+          pauseOnHover
+          theme='light'
+          autoClose={5_000}
+          hideProgressBar
+          limit={2}
+        />
+      </TypinkProvider>
+    </ChakraProvider>
+  );
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <ChakraProvider theme={theme}>
-    <TypinkProvider deployments={deployments} defaultCaller={DEFAULT_CALLER} defaultNetworkId={NetworkId.POP_TESTNET}>
-      <App />
-      <ToastContainer
-        position='top-right'
-        closeOnClick
-        pauseOnHover
-        theme='light'
-        autoClose={5_000}
-        hideProgressBar
-        limit={2}
-      />
-    </TypinkProvider>
-  </ChakraProvider>,
-);
+root.render(<Root />);

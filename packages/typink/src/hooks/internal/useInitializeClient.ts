@@ -1,20 +1,23 @@
 import { useState } from 'react';
-import { useAsync, useLocalStorage, useToggle } from 'react-use';
-import { JsonRpcApi, NetworkInfo } from '../types.js';
+import { useAsync, useToggle } from 'react-use';
+import { JsonRpcApi, NetworkInfo } from '../../types.js';
 import { DedotClient, ISubstrateClient, JsonRpcProvider, LegacyClient, WsProvider } from 'dedot';
 import { SubstrateApi } from 'dedot/chaintypes';
 import { RpcVersion } from 'dedot/types';
 
 export type CompatibleSubstrateClient = ISubstrateClient<SubstrateApi[RpcVersion]>;
 
-export type UseApi = {
+export type UseClient = {
   ready: boolean;
   client?: CompatibleSubstrateClient;
 };
 
-export function useClient(network?: NetworkInfo): UseApi {
-  // TODO review this again, we should expose & let end-user customize this
-  const [cacheMetadata] = useLocalStorage<boolean>('TYPINK/SETTINGS/CACHE_METADATA', true);
+export type UseClientOptions = {
+  cacheMetadata: boolean;
+};
+
+export function useInitializeClient(network?: NetworkInfo, options?: UseClientOptions): UseClient {
+  const { cacheMetadata = false } = options || {};
 
   const [ready, setReady] = useToggle(false);
   const [client, setClient] = useState<CompatibleSubstrateClient>();
@@ -32,9 +35,9 @@ export function useClient(network?: NetworkInfo): UseApi {
 
     setReady(false);
 
+    // TODO support light-client
     const provider: JsonRpcProvider = new WsProvider(network.provider);
 
-    // Using LegacyClient for now in development mode
     if (network.jsonRpcApi === JsonRpcApi.LEGACY) {
       setClient(await LegacyClient.new({ provider, cacheMetadata }));
     } else {
