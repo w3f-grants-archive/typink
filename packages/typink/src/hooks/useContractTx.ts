@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useTypink } from '../providers/index.js';
+import { useTypink } from '../hooks/index.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import {
   Contract,

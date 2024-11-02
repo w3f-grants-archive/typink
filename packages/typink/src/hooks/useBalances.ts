@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAsync } from 'react-use';
-import { useTypink } from '../providers/index.js';
-import { SubstrateAddress } from '../types';
+import { useTypink } from '../hooks/index.js';
+import { SubstrateAddress } from '../types.js';
 
 export interface Balance {
   free: bigint;
