@@ -30,7 +30,12 @@ export function useInitializeClient(network?: NetworkInfo, options?: UseClientOp
     }
 
     if (client) {
-      await client.disconnect();
+      try {
+        // TODO check this again if the network is not available
+        await client.disconnect();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     setReady(false);
