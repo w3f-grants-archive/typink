@@ -21,7 +21,7 @@ export interface ContractQuery<ChainApi extends GenericSubstrateApi> extends Gen
    **/
   greet: GenericContractQueryCall<
     ChainApi,
-    (options: ContractCallOptions) => Promise<GenericContractCallResult<string, ContractCallResult<ChainApi>>>
+    (options?: ContractCallOptions) => Promise<GenericContractCallResult<string, ContractCallResult<ChainApi>>>
   >;
 
   /**
@@ -36,7 +36,7 @@ export interface ContractQuery<ChainApi extends GenericSubstrateApi> extends Gen
     ChainApi,
     (
       newValue: string,
-      options: ContractCallOptions,
+      options?: ContractCallOptions,
     ) => Promise<GenericContractCallResult<[], ContractCallResult<ChainApi>>>
   >;
 }

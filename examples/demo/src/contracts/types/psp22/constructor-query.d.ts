@@ -29,7 +29,7 @@ export interface ConstructorQuery<ChainApi extends GenericSubstrateApi> extends 
       name: string | undefined,
       symbol: string | undefined,
       decimals: number,
-      options: ConstructorCallOptions,
+      options?: ConstructorCallOptions,
     ) => Promise<GenericConstructorCallResult<[], ContractInstantiateResult<ChainApi>>>
   >;
 }
