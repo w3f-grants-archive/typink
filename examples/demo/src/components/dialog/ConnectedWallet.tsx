@@ -1,5 +1,4 @@
 import { Flex, Text } from '@chakra-ui/react';
-import React from 'react';
 import { useTypink } from 'typink';
 
 export default function ConnectedWallet() {
