@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useBoolean, useDeepCompareEffect } from 'react-use';
 import { useRefresher } from './internal/index.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import { Contract, ContractCallOptions, GenericContractApi } from 'dedot/contracts';
+import { useTypink } from 'src/hooks/useTypink';
+import { Unsub } from 'dedot/types';
 
 type ContractQuery<A extends GenericContractApi = GenericContractApi> = OmitNever<{
   [K in keyof A['query']]: K extends string ? (K extends `${infer Literal}` ? Literal : never) : never;
@@ -48,4 +50,46 @@ export function useContractQuery<
     refresh,
     ...(result || {}),
   } as any;
+}
+
+export function useWatchContractQuery<
+  T extends GenericContractApi = GenericContractApi,
+  M extends keyof ContractQuery<T> = keyof ContractQuery<T>,
+>(
+  parameters: {
+    contract: Contract<T> | undefined;
+    fn: M;
+    options?: ContractCallOptions;
+  } & Args<Pop<Parameters<T['query'][M]>>>,
+): UseContractQueryReturnType<T, M> {
+  // TODO replace loading tracking state with tanstack
+  const { client } = useTypink();
+  const result = useContractQuery(parameters);
+
+  useEffect(() => {
+    if (!client) return;
+
+    let unsub: Unsub;
+    let done = false;
+
+    client.query.system
+      .number((_) => {
+        result.refresh();
+      })
+      .then((x) => {
+        if (done) {
+          x().catch(console.error);
+        } else {
+          unsub = x;
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      done = true;
+      unsub && unsub();
+    };
+  }, [client]);
+
+  return result;
 }

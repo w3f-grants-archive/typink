@@ -8,10 +8,10 @@ import { GreeterContractApi } from 'contracts/types/greeter';
 import {
   useBalance,
   useContract,
-  useContractQuery,
   useContractTx,
   useTypink,
   useWatchContractEvent,
+  useWatchContractQuery,
 } from 'typink';
 import { txToaster } from '@/utils/txToaster.tsx';
 
@@ -22,11 +22,7 @@ export default function GreetBoard() {
   const setMessageTx = useContractTx(contract, 'setMessage');
   const balance = useBalance(selectedAccount?.address);
 
-  const {
-    data: greet,
-    isLoading,
-    refresh,
-  } = useContractQuery({
+  const { data: greet, isLoading } = useWatchContractQuery({
     contract,
     fn: 'greet',
   });
@@ -59,7 +55,6 @@ export default function GreetBoard() {
       console.error(e, e.message);
       toaster.onError(e);
     } finally {
-      refresh();
       setMessage('');
     }
   };
@@ -75,7 +70,6 @@ export default function GreetBoard() {
     'Greeted',
     useCallback((events) => {
       // re-fetch the greeting message
-      refresh();
 
       events.forEach((greetedEvent) => {
         const {
