@@ -3,7 +3,7 @@ import { useBoolean, useDeepCompareEffect } from 'react-use';
 import { useRefresher } from './internal/index.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import { Contract, ContractCallOptions, GenericContractApi } from 'dedot/contracts';
-import { useTypink } from 'src/hooks/useTypink';
+import { useTypink } from './useTypink.js';
 import { Unsub } from 'dedot/types';
 
 type ContractQuery<A extends GenericContractApi = GenericContractApi> = OmitNever<{
