@@ -96,10 +96,15 @@ export async function contractTx<
       const dryRun = await contract.query[fn](...args, dryRunOptions);
       console.log('Dry run result:', dryRun);
 
-      // TODO check if data is a Result with error
       const {
+        data,
         raw: { gasRequired },
       } = dryRun;
+
+      // TODO Add a specific contract level error
+      if (data && data['isErr'] && data['err']) {
+        throw new Error(data['err']);
+      }
 
       const actualTxOptions: ContractTxOptions = {
         gasLimit: gasRequired,
