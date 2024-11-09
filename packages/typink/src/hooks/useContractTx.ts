@@ -10,6 +10,7 @@ import {
 } from 'dedot/contracts';
 import { ISubmittableResult } from 'dedot/types';
 import { assert, deferred } from 'dedot/utils';
+import { TypinkError } from '../utils/index.js';
 
 type UseContractTx<A extends GenericContractApi = GenericContractApi> = OmitNever<{
   [K in keyof A['tx']]: K extends string ? (K extends `${infer Literal}` ? Literal : never) : never;
@@ -90,7 +91,6 @@ export async function contractTx<
 
     try {
       // TODO dry running
-
       const dryRunOptions: ContractCallOptions = { caller };
 
       const dryRun = await contract.query[fn](...args, dryRunOptions);
@@ -101,9 +101,9 @@ export async function contractTx<
         raw: { gasRequired },
       } = dryRun;
 
-      // TODO Add a specific contract level error
       if (data && data['isErr'] && data['err']) {
-        throw new Error(data['err']);
+        // TODO Add a specific contract level error
+        throw new TypinkError(JSON.stringify(data['err']));
       }
 
       const actualTxOptions: ContractTxOptions = {
