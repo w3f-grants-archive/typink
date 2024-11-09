@@ -5,9 +5,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import App from '@/App';
 import { theme } from '@/theme';
 import { deployments } from '@/contracts/deployments';
-import { NetworkId, TypinkProvider } from 'typink';
+import { alephZeroTestnet, development, NetworkId, popTestnet, TypinkProvider } from 'typink';
 
 const DEFAULT_CALLER = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Alice
+const SUPPORTED_NETWORK = [popTestnet, alephZeroTestnet];
+if (process.env.NODE_ENV === 'development') {
+  SUPPORTED_NETWORK.push(development);
+}
 
 function Root() {
   return (
@@ -15,6 +19,7 @@ function Root() {
       <TypinkProvider
         deployments={deployments}
         defaultCaller={DEFAULT_CALLER}
+        supportedNetworks={SUPPORTED_NETWORK}
         defaultNetworkId={NetworkId.POP_TESTNET}
         cacheMetadata={true}>
         <App />
@@ -25,7 +30,7 @@ function Root() {
           theme='light'
           autoClose={5_000}
           hideProgressBar
-          limit={2}
+          limit={5}
         />
       </TypinkProvider>
     </ChakraProvider>

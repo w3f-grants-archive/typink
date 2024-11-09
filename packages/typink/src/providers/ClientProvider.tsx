@@ -1,48 +1,59 @@
-import { createContext, useContext, useEffect, useMemo } from 'react';
-import { useLocalStorage } from 'react-use';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useInitializeClient } from '../hooks/internal/index.js';
 import { useWalletContext } from './WalletProvider.js';
 import { NetworkInfo, Props } from '../types.js';
-import { NetworkId, SUPPORTED_NETWORKS } from '../utils/index.js';
 import { ISubstrateClient } from 'dedot';
 import { SubstrateApi } from 'dedot/chaintypes';
 import { RpcVersion } from 'dedot/types';
+import { assert } from 'dedot/utils';
+import { development, NetworkId } from '../networks/index.js';
 
 export interface ClientContextProps extends Props {
   client?: ISubstrateClient<SubstrateApi[RpcVersion]>;
   ready: boolean;
+  supportedNetworks: NetworkInfo[];
   network: NetworkInfo;
   networkId: NetworkId;
   setNetworkId: (one: NetworkId) => void;
   cacheMetadata?: boolean;
 }
 
-const DEFAULT_NETWORK = NetworkId.POP_TESTNET;
-
-export const ClientContext = createContext<ClientContextProps>({
-  ready: false,
-  network: SUPPORTED_NETWORKS[NetworkId.POP_TESTNET],
-  networkId: NetworkId.POP_TESTNET,
-  setNetworkId: () => {},
-});
+export const ClientContext = createContext<ClientContextProps>({} as any);
 
 export const useClientContext = () => {
   return useContext(ClientContext);
 };
 
 export interface ClientProviderProps extends Props {
-  defaultNetworkId?: NetworkId;
-  cacheMetadata?: boolean;
+  supportedNetworks?: NetworkInfo[];
+  defaultNetworkId?: NetworkId; // default to the first network in supported list
+  cacheMetadata?: boolean; // default to false
 }
+
+const DEFAULT_NETWORKS = [development];
 
 export function ClientProvider({
   children,
-  defaultNetworkId = DEFAULT_NETWORK,
+  defaultNetworkId,
+  supportedNetworks = DEFAULT_NETWORKS,
   cacheMetadata = false,
 }: ClientProviderProps) {
+  assert(supportedNetworks.length > 0, 'Required at least one supported network');
+
   const { injectedApi } = useWalletContext();
-  const [networkId, setNetworkId] = useLocalStorage<string>('SELECTED_NETWORK_ID', defaultNetworkId);
-  const network = useMemo(() => SUPPORTED_NETWORKS[networkId!], [networkId]);
+
+  const initialNetworkId = useMemo<NetworkId>(() => {
+    return (defaultNetworkId || supportedNetworks[0].id) as NetworkId;
+  }, [defaultNetworkId, supportedNetworks]);
+
+  const [networkId, setNetworkId] = useState<NetworkId>(initialNetworkId);
+
+  const network = useMemo(
+    () => supportedNetworks.find((network) => network.id === networkId),
+    [networkId, supportedNetworks],
+  );
+
+  assert(network, `NetworkId ${initialNetworkId} is not available`);
 
   // TODO supports multi clients
   const { ready, client } = useInitializeClient(network, { cacheMetadata });
@@ -61,6 +72,7 @@ export function ClientProvider({
         networkId: networkId as NetworkId,
         setNetworkId,
         cacheMetadata,
+        supportedNetworks,
       }}>
       {children}
     </ClientContext.Provider>

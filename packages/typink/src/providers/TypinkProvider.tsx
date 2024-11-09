@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 import {
   ClientContextProps,
   ClientProvider,
@@ -41,10 +41,14 @@ export function TypinkProvider({
   defaultCaller,
   defaultNetworkId,
   cacheMetadata = false,
+  supportedNetworks,
 }: TypinkProviderProps) {
   return (
     <WalletProvider>
-      <ClientProvider defaultNetworkId={defaultNetworkId} cacheMetadata={cacheMetadata}>
+      <ClientProvider
+        defaultNetworkId={defaultNetworkId}
+        cacheMetadata={cacheMetadata}
+        supportedNetworks={supportedNetworks}>
         <TypinkProviderWrapper deployments={deployments} defaultCaller={defaultCaller}>
           {children}
         </TypinkProviderWrapper>
