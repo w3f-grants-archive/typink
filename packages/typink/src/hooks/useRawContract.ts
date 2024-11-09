@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useAsync } from 'react-use';
 import { useTypink } from './useTypink.js';
-import { Contract, ContractMetadata, GenericContractApi } from 'dedot/contracts';
+import { Contract, ContractMetadata, ExecutionOptions, GenericContractApi } from 'dedot/contracts';
 
 export function useRawContract<T extends GenericContractApi = GenericContractApi>(
   metadata?: string | ContractMetadata,
   address?: string,
+  options: ExecutionOptions = {},
 ) {
-  const { client } = useTypink();
+  const { client, defaultCaller, selectedAccount } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
   useAsync(async () => {
@@ -19,8 +20,18 @@ export function useRawContract<T extends GenericContractApi = GenericContractApi
       return;
     }
 
-    setContract(new Contract<T>(client, metadata as any, address));
-  }, [client, metadata, address]);
+    setContract(
+      new Contract<T>(
+        client,
+        metadata as any,
+        address, // prettier-end-here
+        {
+          defaultCaller: selectedAccount?.address || defaultCaller,
+          ...options,
+        },
+      ),
+    );
+  }, [client, metadata, address, selectedAccount?.address, defaultCaller]);
 
   return {
     contract,

@@ -12,18 +12,18 @@ export function useContract<T extends GenericContractApi = GenericContractApi>(
   contractId: string,
   options: ExecutionOptions = {},
 ): UseContract<T> {
-  const { deployments, client, network, selectedAccount, defaultCaller } = useTypink();
+  const { deployments, client, networkId, selectedAccount, defaultCaller } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
   useAsync(async () => {
-    if (!client || !network) {
+    if (!client || !networkId) {
       setContract(undefined);
       return;
     }
 
-    const deployment = deployments.find((d) => d.id === contractId && d.network === network.id);
+    const deployment = deployments.find((d) => d.id === contractId && d.network === networkId);
     if (!deployment) {
-      throw new TypinkError(`Contract deployment with id: ${contractId} not found on network: ${network.id}`);
+      throw new TypinkError(`Contract deployment with id: ${contractId} not found on network: ${networkId}`);
     }
 
     const contract = new Contract<T>(
@@ -37,7 +37,7 @@ export function useContract<T extends GenericContractApi = GenericContractApi>(
     );
 
     setContract(contract);
-  }, [client, network, selectedAccount]);
+  }, [client, networkId, selectedAccount?.address, defaultCaller]);
 
   return {
     contract,
