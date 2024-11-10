@@ -30,7 +30,7 @@ function Root() {
           theme='light'
           autoClose={5_000}
           hideProgressBar
-          limit={5}
+          limit={10}
         />
       </TypinkProvider>
     </ChakraProvider>

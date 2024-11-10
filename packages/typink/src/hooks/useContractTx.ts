@@ -27,14 +27,17 @@ type UseContractTxReturnType<
       // TODO status callback, signer option
     } & Args<Pop<Parameters<T['tx'][M]>>>,
   ): Promise<void>;
-  isInProgress: boolean;
+  inProgress: boolean;
+  inBestBlockProgress: boolean;
 };
 
 export function useContractTx<
   T extends GenericContractApi = GenericContractApi,
   M extends keyof UseContractTx<T> = keyof UseContractTx<T>,
 >(contract: Contract<T> | undefined, fn: M): UseContractTxReturnType<T, M> {
-  const [isInProgress, setIsInProgress] = useState(false);
+  const [inProgress, setInProgress] = useState(false);
+  const [inBestBlockProgress, setInBestBlockProgress] = useState(false);
+
   const { selectedAccount } = useTypink();
 
   const signAndSend = useMemo(() => {
@@ -42,11 +45,21 @@ export function useContractTx<
       assert(contract, 'Contract not found');
       assert(selectedAccount, 'Selected account not found');
 
-      setIsInProgress(true);
+      setInProgress(true);
+      setInBestBlockProgress(true);
 
       try {
         // @ts-ignore
-        const { args = [], txOptions, callback } = o;
+        const { args = [], txOptions, callback: optionalCallback } = o;
+
+        const callback = (result: ISubmittableResult) => {
+          const { status } = result;
+          if (status.type === 'BestChainBlockIncluded') {
+            setInBestBlockProgress(false);
+          }
+
+          optionalCallback && optionalCallback(result);
+        };
 
         // @ts-ignore
         await contractTx({
@@ -58,14 +71,16 @@ export function useContractTx<
           callback,
         });
       } finally {
-        setIsInProgress(false);
+        setInProgress(false);
+        setInBestBlockProgress(false);
       }
     };
   }, [contract, selectedAccount]);
 
   return {
     signAndSend,
-    isInProgress,
+    inProgress,
+    inBestBlockProgress,
   };
 }
 

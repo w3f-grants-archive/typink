@@ -48,14 +48,16 @@ export default function GreetBoard() {
         callback: ({ status }) => {
           console.log(status);
 
+          if (status.type === 'BestChainBlockIncluded') {
+            setMessage('');
+          }
+
           toaster.updateTxStatus(status);
         },
       });
     } catch (e: any) {
       console.error(e, e.message);
       toaster.onError(e);
-    } finally {
-      setMessage('');
     }
   };
 
@@ -113,7 +115,7 @@ export default function GreetBoard() {
             maxLength={50}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            isDisabled={setMessageTx.isInProgress}
+            isDisabled={setMessageTx.inBestBlockProgress}
           />
           <FormHelperText>Max 50 characters</FormHelperText>
         </FormControl>
@@ -121,7 +123,7 @@ export default function GreetBoard() {
           size='sm'
           mt={4}
           isDisabled={!message}
-          isLoading={setMessageTx.isInProgress}
+          isLoading={setMessageTx.inBestBlockProgress}
           onClick={handleUpdateGreeting}>
           Update Greeting
         </Button>

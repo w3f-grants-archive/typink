@@ -57,6 +57,12 @@ export default function Psp22Board() {
         args: [BigInt(100 * Math.pow(10, tokenDecimal))],
         callback: ({ status }) => {
           console.log(status);
+
+          if (status.type === 'BestChainBlockIncluded') {
+            refreshMyBalance();
+            refreshTotalSupply();
+          }
+
           toaster.updateTxStatus(status);
         },
       });
@@ -110,7 +116,7 @@ export default function Psp22Board() {
         </Box>
         {selectedAccount && (
           <Box mt={4}>
-            <Button size='sm' onClick={mintNewToken} isLoading={mintTx.isInProgress} isDisabled={!mintable}>
+            <Button size='sm' onClick={mintNewToken} isLoading={mintTx.inBestBlockProgress} isDisabled={!mintable}>
               Mint 100 {tokenSymbol}
             </Button>
             {!mintable && (
