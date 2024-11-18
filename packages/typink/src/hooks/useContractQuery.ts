@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useBoolean, useDeepCompareEffect } from 'react-use';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRefresher } from './internal/index.js';
 import { Args, OmitNever, Pop } from '../types.js';
 import { Contract, ContractCallOptions, GenericContractApi } from 'dedot/contracts';
 import { useTypink } from './useTypink.js';
 import { Unsub } from 'dedot/types';
+import deepEqual from 'fast-deep-equal/react';
 
 type ContractQuery<A extends GenericContractApi = GenericContractApi> = OmitNever<{
   [K in keyof A['query']]: K extends string ? (K extends `${infer Literal}` ? Literal : never) : never;
@@ -16,6 +16,7 @@ type UseContractQueryReturnType<
 > = {
   isLoading: boolean;
   refresh: () => void;
+  error?: Error;
 } & Partial<Awaited<ReturnType<T['query'][M]>>>;
 
 export function useContractQuery<
@@ -29,26 +30,55 @@ export function useContractQuery<
   } & Args<Pop<Parameters<T['query'][M]>>>,
 ): UseContractQueryReturnType<T, M> {
   // TODO replace loading tracking state with tanstack
-  const [isLoading, setIsLoading] = useBoolean(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [result, setResult] = useState<any>();
+  const [error, setError] = useState<Error>();
   const { refresh, counter } = useRefresher();
 
   const { contract, fn, args = [], options } = parameters;
 
-  useDeepCompareEffect(() => {
-    (async () => {
+  const depsRef = useRef<any[] | undefined>(undefined);
+  const currentDeps = [contract, fn, args, options, counter];
+  if (!depsRef.current || !deepEqual(depsRef.current, currentDeps)) {
+    depsRef.current = currentDeps;
+  }
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchData = async () => {
       if (!contract || !fn || !args) return;
 
-      const result = await contract.query[fn](...args, options);
-      setResult(result);
-      setIsLoading(false);
-    })();
-  }, [contract, fn, args, counter]);
+      try {
+        const queryResult = await contract.query[fn](...args, options);
+        if (mounted) {
+          setResult(queryResult);
+          setError(undefined);
+          setIsLoading(false);
+        }
+      } catch (error: any) {
+        console.error('Error in contract query:', error);
+
+        if (mounted) {
+          setResult(undefined);
+          setError(error);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData().catch(console.error);
+
+    return () => {
+      mounted = false;
+    };
+  }, depsRef.current);
 
   return {
     isLoading,
     refresh,
     ...(result || {}),
+    error,
   } as any;
 }
 

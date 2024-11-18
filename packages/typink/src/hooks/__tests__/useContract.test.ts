@@ -1,9 +1,10 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useContract } from '../useContract';
 import { useTypink } from '../useTypink';
 import { Contract } from 'dedot/contracts';
 import { TypinkError } from '../../utils';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { waitForNextUpdate } from './test-utils';
 
 vi.mock('../useTypink', () => ({
   useTypink: vi.fn(),
@@ -45,9 +46,7 @@ describe('useContract', () => {
   it('should initialize contract when all required parameters are present', async () => {
     const { result } = renderHook(() => useContract('test-contract'));
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
+    await waitForNextUpdate();
 
     expect(result.current.contract).toBeDefined();
     expect(Contract).toHaveBeenCalledTimes(1);
@@ -96,9 +95,7 @@ describe('useContract', () => {
   it('should reinitialize contract when selectedAccount changes', async () => {
     const { result, rerender } = renderHook(() => useContract('test-contract'));
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
+    await waitForNextUpdate();
 
     expect(result.current.contract).toBeDefined();
     expect(Contract).toHaveBeenCalledTimes(1);
@@ -109,9 +106,8 @@ describe('useContract', () => {
       selectedAccount: newSelectedAccount,
     });
 
-    await act(async () => {
+    await waitForNextUpdate(async () => {
       rerender();
-      await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
     expect(Contract).toHaveBeenCalledTimes(2);
@@ -133,9 +129,7 @@ describe('useContract', () => {
 
     const { result } = renderHook(() => useContract('test-contract'));
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
+    await waitForNextUpdate();
 
     expect(result.current.contract).toBeDefined();
     expect(Contract).toHaveBeenCalledTimes(1);
