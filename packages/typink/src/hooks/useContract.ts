@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useAsync } from 'react-use';
+import { useEffect, useState } from 'react';
 import { useTypink } from './useTypink.js';
 import { Contract, ExecutionOptions, GenericContractApi } from 'dedot/contracts';
 import { TypinkError } from '../utils/index.js';
@@ -15,7 +14,7 @@ export function useContract<T extends GenericContractApi = GenericContractApi>(
   const { deployments, client, networkId, selectedAccount, defaultCaller } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
-  useAsync(async () => {
+  useEffect(() => {
     if (!client || !networkId) {
       setContract(undefined);
       return;

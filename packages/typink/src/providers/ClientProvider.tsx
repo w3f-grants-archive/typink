@@ -55,7 +55,7 @@ export function ClientProvider({
 
   assert(network, `NetworkId ${initialNetworkId} is not available`);
 
-  // TODO supports multi clients
+  // TODO supports multi clients & lazy initialization
   const { ready, client } = useInitializeClient(network, { cacheMetadata });
 
   useEffect(() => {
