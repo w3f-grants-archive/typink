@@ -1,29 +1,36 @@
-import { createContext, useContext, useState } from 'react';
-import { useAsync, useLocalStorage } from 'react-use';
-import { Injected } from '@polkadot/extension-inject/types';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocalStorage } from 'react-use';
 import { useWallets } from '../hooks/index.js';
 import { InjectedAccount, Props } from '../types.js';
 import { Wallet } from '../wallets/index.js';
+import { assert } from 'dedot/utils';
+import type { Signer as InjectedSigner } from '@polkadot/api/types';
 
+// Split these into 2 separate context (one for setup & one for signer & connected account)
 export interface WalletContextProps {
-  enableWallet: (id: string) => void;
-  signOut: () => void;
-  availableWallets: Wallet[];
+  // for setting up wallets
+  connectWallet: (id: string) => void;
+  disconnect: () => void;
+
   connectedWalletId?: string;
   connectedWallet?: Wallet;
 
+  setConnectedAccount: (account: InjectedAccount) => void;
   accounts: InjectedAccount[];
-  injectedApi?: Injected;
-  selectedAccount?: InjectedAccount;
-  setSelectedAccount: (account: InjectedAccount) => void;
+
+  wallets: Wallet[];
+
+  // Important
+  signer?: InjectedSigner;
+  connectedAccount?: InjectedAccount;
 }
 
 export const WalletContext = createContext<WalletContextProps>({
   accounts: [],
-  enableWallet: () => {},
-  signOut: () => {},
-  availableWallets: [],
-  setSelectedAccount: () => {},
+  connectWallet: () => {},
+  disconnect: () => {},
+  wallets: [],
+  setConnectedAccount: () => {},
 });
 
 export const useWalletContext = () => {
@@ -33,78 +40,66 @@ export const useWalletContext = () => {
 export interface WalletProviderProps extends Props {}
 
 export function WalletProvider({ children }: WalletProviderProps) {
-  const availableWallets = useWallets();
+  const wallets = useWallets();
   const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
-  const [injectedApi, setInjectedApi] = useState<Injected>();
+  const [signer, setSigner] = useState<InjectedSigner>();
+
   const [connectedWalletId, setConnectedWalletId, removeConnectedWalletId] =
-    useLocalStorage<string>('CONNECTED_WALLET');
-  const [connectedWallet, setConnectedWallet] = useState<Wallet>();
-  const [selectedAccount, setSelectedAccount, removeSelectedAccount] =
-    useLocalStorage<InjectedAccount>('SELECTED_ACCOUNT');
+    useLocalStorage<string>('TYPINK::CONNECTED_WALLET');
+  const [connectedAccount, setConnectedAccount, removeConnectedAccount] =
+    useLocalStorage<InjectedAccount>('TYPINK::CONNECTED_ACCOUNT');
 
-  const getWallet = (id: string): Wallet => {
-    const targetWallet: Wallet = availableWallets.find((one) => one.id === id)!;
-    if (!targetWallet) {
-      throw new Error('Invalid Wallet ID');
-    }
+  const getWallet = (id?: string): Wallet => wallets.find((one) => one.id === id)!;
 
-    return targetWallet;
-  };
+  const connectedWallet = useMemo(() => getWallet(connectedWalletId), [connectedWalletId]);
 
-  useAsync(async () => {
-    if (!connectedWalletId) {
-      setConnectedWallet(undefined);
-      return;
-    }
+  useEffect(() => {
+    if (!connectedWalletId) return;
 
     let unsub: () => void;
-    try {
+
+    (async () => {
       const targetWallet: Wallet = getWallet(connectedWalletId);
-      setConnectedWallet(targetWallet);
+
+      assert(targetWallet, `Wallet Id Not Found ${connectedWalletId}`);
 
       await targetWallet.waitUntilReady();
-
       const injectedProvider = targetWallet.injectedProvider;
-      if (!injectedProvider?.enable) {
-        throw new Error('Wallet is not existed!');
-      }
 
-      const injectedApi = await injectedProvider.enable('Sample Dapp');
+      assert(injectedProvider?.enable, `Invalid Wallet: ${targetWallet.id}`);
 
-      unsub = injectedApi.accounts.subscribe(setAccounts);
+      const injected = await injectedProvider.enable('Sample Dapp');
 
-      setInjectedApi(injectedApi);
-    } catch (e: any) {
-      console.error(e.message);
-      setConnectedWallet(undefined);
-      removeConnectedWalletId();
-    }
+      unsub = injected.accounts.subscribe(setAccounts);
+
+      setSigner(injected.signer);
+    })();
 
     return () => unsub && unsub();
   }, [connectedWalletId]);
 
-  const enableWallet = async (walletId: string) => {
+  const connectWallet = async (walletId: string) => {
     setConnectedWalletId(walletId);
   };
 
-  const signOut = () => {
+  const disconnect = () => {
     removeConnectedWalletId();
-    setInjectedApi(undefined);
-    removeSelectedAccount();
+    setSigner(undefined);
+    removeConnectedAccount();
   };
 
   return (
     <WalletContext.Provider
       value={{
         accounts,
-        enableWallet,
-        injectedApi,
-        signOut,
-        availableWallets,
+        connectWallet,
+        signer,
+        disconnect,
+        wallets,
         connectedWalletId,
         connectedWallet,
-        selectedAccount,
-        setSelectedAccount,
+        connectedAccount,
+        setConnectedAccount,
       }}>
       {children}
     </WalletContext.Provider>

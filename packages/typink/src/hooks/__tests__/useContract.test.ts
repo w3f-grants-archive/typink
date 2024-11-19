@@ -22,7 +22,7 @@ describe('useContract', () => {
     metadata: {},
     address: 'test-address',
   };
-  const selectedAccount = { address: 'selected-account-address' };
+  const connectedAccount = { address: 'selected-account-address' };
   const defaultCaller = 'default-caller-address';
 
   const mockedUseTypink = {
@@ -30,7 +30,7 @@ describe('useContract', () => {
     client,
     // @ts-ignore
     networkId: 'test-network',
-    selectedAccount,
+    connectedAccount,
     defaultCaller,
   };
 
@@ -92,7 +92,7 @@ describe('useContract', () => {
     expect(Contract).not.toHaveBeenCalled();
   });
 
-  it('should reinitialize contract when selectedAccount changes', async () => {
+  it('should reinitialize contract when connectedAccount changes', async () => {
     const { result, rerender } = renderHook(() => useContract('test-contract'));
 
     await waitForNextUpdate();
@@ -103,7 +103,7 @@ describe('useContract', () => {
     const newSelectedAccount = { address: 'new-selected-account-address' };
     vi.mocked(useTypink).mockReturnValue({
       ...vi.mocked(useTypink).mock.results[0].value,
-      selectedAccount: newSelectedAccount,
+      connectedAccount: newSelectedAccount,
     });
 
     await waitForNextUpdate(async () => {
@@ -121,10 +121,10 @@ describe('useContract', () => {
     );
   });
 
-  it('should use defaultCaller when selectedAccount is not available', async () => {
+  it('should use defaultCaller when connectedAccount is not available', async () => {
     vi.mocked(useTypink).mockReturnValue({
       ...mockedUseTypink,
-      selectedAccount: undefined,
+      connectedAccount: undefined,
     } as any);
 
     const { result } = renderHook(() => useContract('test-contract'));

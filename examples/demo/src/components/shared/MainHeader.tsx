@@ -4,7 +4,7 @@ import WalletSelection from '@/components/dialog/WalletSelection.tsx';
 import { useTypink } from 'typink';
 
 export default function MainHeader() {
-  const { injectedApi } = useTypink();
+  const { signer } = useTypink();
 
   return (
     <Box borderBottom={1} borderStyle='solid' borderColor='gray.200'>
@@ -22,7 +22,7 @@ export default function MainHeader() {
             <img src='/dedot-dark-logo.png' />
           </Box>
         </a>
-        <Flex gap={2}>{injectedApi ? <AccountSelection /> : <WalletSelection />}</Flex>
+        <Flex gap={2}>{signer ? <AccountSelection /> : <WalletSelection />}</Flex>
       </Container>
     </Box>
   );

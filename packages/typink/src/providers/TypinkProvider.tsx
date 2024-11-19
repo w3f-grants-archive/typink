@@ -7,6 +7,7 @@ import {
 } from '../providers/ClientProvider.js';
 import { useWalletContext, WalletContextProps, WalletProvider } from '../providers/WalletProvider.js';
 import { ContractDeployment, SubstrateAddress } from '../types.js';
+import { useLocalStorage } from 'react-use';
 
 export interface TypinkContextProps extends ClientContextProps, WalletContextProps {
   deployments: ContractDeployment[];

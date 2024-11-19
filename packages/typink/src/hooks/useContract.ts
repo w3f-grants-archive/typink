@@ -11,7 +11,7 @@ export function useContract<T extends GenericContractApi = GenericContractApi>(
   contractId: string,
   options: ExecutionOptions = {},
 ): UseContract<T> {
-  const { deployments, client, networkId, selectedAccount, defaultCaller } = useTypink();
+  const { deployments, client, networkId, connectedAccount, defaultCaller } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
   useEffect(() => {
@@ -30,13 +30,13 @@ export function useContract<T extends GenericContractApi = GenericContractApi>(
       deployment.metadata,
       deployment.address, // prettier-end-here
       {
-        defaultCaller: selectedAccount?.address || defaultCaller,
+        defaultCaller: connectedAccount?.address || defaultCaller,
         ...options,
       },
     );
 
     setContract(contract);
-  }, [client, networkId, selectedAccount?.address, defaultCaller]);
+  }, [client, networkId, connectedAccount?.address, defaultCaller]);
 
   return {
     contract,

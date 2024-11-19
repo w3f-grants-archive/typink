@@ -38,12 +38,12 @@ export function useContractTx<
   const [inProgress, setInProgress] = useState(false);
   const [inBestBlockProgress, setInBestBlockProgress] = useState(false);
 
-  const { selectedAccount } = useTypink();
+  const { connectedAccount } = useTypink();
 
   const signAndSend = useMemo(() => {
     return async (o: Parameters<UseContractTxReturnType<T>['signAndSend']>[0]) => {
-      assert(contract, 'Contract not found');
-      assert(selectedAccount, 'Selected account not found');
+      assert(contract, 'Contract Not Found');
+      assert(connectedAccount, 'Connected Account Not Found');
 
       setInProgress(true);
       setInBestBlockProgress(true);
@@ -66,7 +66,7 @@ export function useContractTx<
           contract,
           fn,
           args,
-          caller: selectedAccount.address,
+          caller: connectedAccount.address,
           txOptions,
           callback,
         });
@@ -75,7 +75,7 @@ export function useContractTx<
         setInBestBlockProgress(false);
       }
     };
-  }, [contract, selectedAccount]);
+  }, [contract, connectedAccount]);
 
   return {
     signAndSend,

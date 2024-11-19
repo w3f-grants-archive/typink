@@ -40,7 +40,7 @@ export function ClientProvider({
 }: ClientProviderProps) {
   assert(supportedNetworks.length > 0, 'Required at least one supported network');
 
-  const { injectedApi } = useWalletContext();
+  const { signer } = useWalletContext();
 
   const initialNetworkId = useMemo<NetworkId>(() => {
     return (defaultNetworkId || supportedNetworks[0].id) as NetworkId;
@@ -59,8 +59,8 @@ export function ClientProvider({
   const { ready, client } = useInitializeClient(network, { cacheMetadata });
 
   useEffect(() => {
-    client?.setSigner(injectedApi?.signer);
-  }, [injectedApi, client]);
+    client?.setSigner(signer);
+  }, [signer, client]);
 
   return (
     <ClientContext.Provider

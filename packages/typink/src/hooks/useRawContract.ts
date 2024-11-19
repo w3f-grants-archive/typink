@@ -8,7 +8,7 @@ export function useRawContract<T extends GenericContractApi = GenericContractApi
   address?: string,
   options: ExecutionOptions = {},
 ) {
-  const { client, defaultCaller, selectedAccount } = useTypink();
+  const { client, defaultCaller, connectedAccount } = useTypink();
   const [contract, setContract] = useState<Contract<T>>();
 
   useAsync(async () => {
@@ -26,12 +26,12 @@ export function useRawContract<T extends GenericContractApi = GenericContractApi
         metadata as any,
         address, // prettier-end-here
         {
-          defaultCaller: selectedAccount?.address || defaultCaller,
+          defaultCaller: connectedAccount?.address || defaultCaller,
           ...options,
         },
       ),
     );
-  }, [client, metadata, address, selectedAccount?.address, defaultCaller]);
+  }, [client, metadata, address, connectedAccount?.address, defaultCaller]);
 
   return {
     contract,

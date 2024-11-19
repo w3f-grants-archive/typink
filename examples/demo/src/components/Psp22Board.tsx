@@ -10,7 +10,7 @@ import { txToaster } from '@/utils/txToaster.tsx';
 
 export default function Psp22Board() {
   const { contract } = useContract<Psp22ContractApi>(ContractId.PSP22);
-  const { defaultCaller, selectedAccount, networkId } = useTypink();
+  const { defaultCaller, connectedAccount, networkId } = useTypink();
   const mintable = useMemo(() => networkId === NetworkId.ALEPHZERO_TESTNET, [networkId]);
   const mintTx = useContractTx(contract, 'psp22MintableMint');
 
@@ -45,7 +45,7 @@ export default function Psp22Board() {
   } = useContractQuery({
     contract,
     fn: 'psp22BalanceOf',
-    args: [selectedAccount?.address || defaultCaller],
+    args: [connectedAccount?.address || defaultCaller],
   });
 
   const mintNewToken = async () => {
@@ -106,7 +106,7 @@ export default function Psp22Board() {
         <Divider my={4} />
         <Box>
           My Balance:{' '}
-          {selectedAccount ? (
+          {connectedAccount ? (
             <PendingText fontWeight='600' isLoading={loadingBalance}>
               {formatBalance(myBalance, tokenDecimal)} {tokenSymbol}
             </PendingText>
@@ -114,7 +114,7 @@ export default function Psp22Board() {
             <WalletSelection buttonProps={{ size: 'xs' }} />
           )}
         </Box>
-        {selectedAccount && (
+        {connectedAccount && (
           <Box mt={4}>
             <Button size='sm' onClick={mintNewToken} isLoading={mintTx.inBestBlockProgress} isDisabled={!mintable}>
               Mint 100 {tokenSymbol}

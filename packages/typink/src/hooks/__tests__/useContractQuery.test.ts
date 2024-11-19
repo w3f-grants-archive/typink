@@ -38,7 +38,6 @@ describe('useContractQuery', () => {
       }),
     );
 
-    console.log(result.current);
     expect(result.current.isLoading).toBe(true);
   });
 
