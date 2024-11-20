@@ -7,26 +7,18 @@ export interface WalletOptions {
 }
 
 export abstract class Wallet<Options extends WalletOptions = WalletOptions> {
-  #options: Options;
-
-  constructor(options: Options) {
-    this.#options = options;
-  }
+  constructor(public options: Options) {}
 
   get id() {
-    return this.#options.id;
+    return this.options.id;
   }
 
   get name() {
-    return this.#options.name;
+    return this.options.name;
   }
 
   get logo() {
-    return this.#options.logo;
-  }
-
-  get options() {
-    return this.#options;
+    return this.options.logo;
   }
 
   get version() {
@@ -53,10 +45,6 @@ export abstract class Wallet<Options extends WalletOptions = WalletOptions> {
 
   get installed() {
     return false;
-  }
-
-  async initialize() {
-    // To implement in subclass
   }
 
   async waitUntilReady() {

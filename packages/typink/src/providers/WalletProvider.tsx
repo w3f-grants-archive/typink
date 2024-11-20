@@ -18,8 +18,6 @@ export interface WalletContextProps {
   setConnectedAccount: (account: InjectedAccount) => void;
   accounts: InjectedAccount[];
 
-  wallets: Wallet[];
-
   // Important
   signer?: InjectedSigner;
   connectedAccount?: InjectedAccount;
@@ -29,7 +27,6 @@ export const WalletContext = createContext<WalletContextProps>({
   accounts: [],
   connectWallet: () => {},
   disconnect: () => {},
-  wallets: [],
   setConnectedAccount: () => {},
 });
 
@@ -40,7 +37,7 @@ export const useWalletContext = () => {
 export interface WalletProviderProps extends Props {}
 
 export function WalletProvider({ children }: WalletProviderProps) {
-  const wallets = useWallets();
+  const { wallets } = useWallets();
   const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
   const [signer, setSigner] = useState<InjectedSigner>();
 
@@ -95,7 +92,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
         connectWallet,
         signer,
         disconnect,
-        wallets,
         connectedWalletId,
         connectedWallet,
         connectedAccount,

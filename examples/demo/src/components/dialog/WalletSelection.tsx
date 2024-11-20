@@ -12,7 +12,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { ThemingProps } from '@chakra-ui/system';
-import { useTypink, Wallet } from 'typink';
+import { useTypink, useWallets, Wallet } from 'typink';
 
 interface WalletButtonProps {
   walletInfo: Wallet;
@@ -63,7 +63,7 @@ export default function WalletSelection({
   buttonProps,
 }: WalletSelectionProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { wallets } = useTypink();
+  const { wallets } = useWallets();
 
   return (
     <>

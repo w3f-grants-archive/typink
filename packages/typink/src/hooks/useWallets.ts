@@ -1,43 +1,40 @@
-import { useState } from 'react';
-import { useEffectOnce } from 'react-use';
 import { ExtensionWallet, Wallet } from '../wallets/index.js';
 
-const A_WALLETS: Wallet[] = [
+const WALLETS: Wallet[] = [
   new ExtensionWallet({
     name: 'SubWallet',
     id: 'subwallet-js',
     logo: '/subwallet-logo.svg',
-    installUrl: '',
+    installUrl: 'https://www.subwallet.app/download.html',
+    websiteUrl: 'https://www.subwallet.app',
   }),
   new ExtensionWallet({
     name: 'Talisman',
     id: 'talisman',
     logo: '/talisman-logo.svg',
-    installUrl: '',
+    installUrl: 'https://talisman.xyz/download',
+    websiteUrl: 'https://talisman.xyz',
   }),
   new ExtensionWallet({
     name: 'Polkadot{.js}',
     id: 'polkadot-js',
     logo: '/polkadot-js-logo.svg',
-    installUrl: '',
+    installUrl: 'https://polkadot.js.org/extension',
+    websiteUrl: 'https://polkadot.js.org',
   }),
 ];
 
-export function useWallets(): Wallet[] {
-  const [wallets, setWallets] = useState<Wallet[]>(A_WALLETS);
+// TODO add more wallets (Enkrypt, PolkaGate,...)
+// TODO allow to add custom wallets outside of the supported list
 
-  useEffectOnce(() => {
-    for (let wallet of wallets) {
-      wallet
-        .initialize()
-        .then(() => {
-          setWallets([...wallets]);
-        })
-        .catch(() => {
-          // TODO: handle error here!
-        });
-    }
-  });
+type UseWallets = {
+  wallets: Wallet[];
+  installedWallets: Wallet[];
+};
 
-  return wallets;
+export function useWallets(): UseWallets {
+  const wallets = WALLETS;
+  const installedWallets = wallets.filter((w) => w.installed);
+
+  return { wallets, installedWallets };
 }
