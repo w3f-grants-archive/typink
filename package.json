@@ -1,7 +1,7 @@
 {
   "name": "typink.dev",
   "private": true,
-  "author": "Thang X. Vu <thang@coongcrafts.io>",
+  "author": "Thang X. Vu <thang@dedot.dev>",
   "packageManager": "yarn@4.3.1",
   "workspaces": [
     "packages/*",
