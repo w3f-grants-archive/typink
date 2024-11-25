@@ -1,0 +1,19 @@
+{
+  "name": "zombienet",
+  "author": "Thang Vu <thang@dedot.dev>",
+  "private": true,
+  "scripts": {
+    "e2e:test": "npx vitest --watch=false --no-file-parallelism"
+  },
+  "dependencies": {
+    "@dedot/chaintypes": "*",
+    "@polkadot/keyring": "^13.2.3",
+    "@polkadot/util-crypto": "^13.2.3",
+    "dedot": "^0.6.0",
+    "typink": "workspace:*"
+  },
+  "devDependencies": {
+    "@polkadot/types": "^14.3.1"
+  },
+  "license": "MIT"
+}

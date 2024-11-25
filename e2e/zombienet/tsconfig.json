@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "outDir": "dist",
+    "rootDir": "src",
+    "declarationDir": "dist",
+    "paths": {
+      "typink": ["../../packages/typink/src"],
+      "typink/*": ["../../packages/typink/src/*"]
+    },
+    "types": [],
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    {
+      "path": "../../packages/typink/tsconfig.json"
+    }
+  ]
+}
