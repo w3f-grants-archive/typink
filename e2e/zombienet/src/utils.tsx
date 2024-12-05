@@ -3,12 +3,15 @@ import Keyring from '@polkadot/keyring';
 import { FlipperContractApi } from './contracts/flipper';
 // @ts-ignore
 import * as flipper from './contracts/flipper_v5.json';
-import { ContractDeployer, parseRawMetadata } from 'dedot/contracts';
-import { assert, deferred } from 'dedot/utils';
+// @ts-ignore
+import * as psp22 from './contracts/psp22.json';
+import { Contract, ContractDeployer, parseRawMetadata } from 'dedot/contracts';
+import { assert, deferred, numberToHex } from 'dedot/utils';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Signer, SignerPayloadJSON } from '@polkadot/types/types';
 import { TypeRegistry } from '@polkadot/types';
+import { Psp22ContractApi } from './contracts/psp22';
 
 await cryptoWaitReady();
 export const KEYRING = new Keyring({ type: 'sr25519' });
@@ -63,6 +66,58 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
   return defer.promise;
 };
 
+export const deployPSP22Contract = async (salt?: string): Promise<string> => {
+  const { alice } = devPairs();
+
+  const caller = alice.address;
+
+  const wasm = psp22.source.wasm!;
+  const deployer = new ContractDeployer<Psp22ContractApi>(client, psp22 as any, wasm);
+
+  // Dry-run to estimate gas fee
+  const {
+    raw: { gasRequired },
+  } = await deployer.query.new(2000n, undefined, undefined, 0, {
+    caller,
+    salt,
+  });
+
+  console.log('Estimated gas required: ', gasRequired);
+
+  const defer = deferred<string>();
+
+  await deployer.tx
+    .new(2000n, undefined, undefined, 0, { gasLimit: gasRequired, salt }) // prettier-end-here;
+    .signAndSend(alice, async ({ status, events }) => {
+      console.log('Transaction status:', status.type);
+
+      if (status.type === 'BestChainBlockIncluded') {
+        const instantiatedEvent = client.events.contracts.Instantiated.find(events);
+
+        assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
+
+        const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
+        defer.resolve(contractAddress);
+      }
+    });
+
+  return defer.promise;
+};
+
+export const mintifyPSP22Balance = async (psp22Address: string, pair: KeyringPair, amount: number): Promise<void> => {
+  const contract = new Contract<Psp22ContractApi>(client, psp22 as any, psp22Address);
+
+  const {
+    raw: { gasRequired },
+  } = await contract.query.psp22MintableMint(BigInt(100 * Math.pow(10, 6)));
+
+  await contract.tx
+    .psp22MintableMint(BigInt(amount * Math.pow(10, 6)), {
+      gasLimit: gasRequired,
+    })
+    .signAndSend(pair);
+};
+
 export const deployFlipperContract = async (salt?: string): Promise<string> => {
   const { alice } = devPairs();
 
@@ -105,4 +160,16 @@ export const devPairs = () => {
   const alice = KEYRING.addFromUri('//Alice');
   const bob = KEYRING.addFromUri('//Bob');
   return { alice, bob };
+};
+
+export const deployAndDeposit = async (): Promise<string> => {
+  const { alice, bob } = devPairs();
+
+  const salt = numberToHex(Date.now());
+  const contractAddress = await deployPSP22Contract(salt);
+
+  await mintifyPSP22Balance(contractAddress, alice, 100);
+  await mintifyPSP22Balance(contractAddress, bob, 200);
+
+  return contractAddress;
 };
