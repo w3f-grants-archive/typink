@@ -53,15 +53,19 @@ export const wrapper = ({ children }: Props) => (
 export const transferNativeBalance = async (from: KeyringPair, to: string, value: bigint): Promise<void> => {
   const defer = deferred<void>();
 
-  await client.tx.balances
-    .transferKeepAlive(to, value) // prettier-end-here
-    .signAndSend(from, async ({ status }) => {
-      console.log(`Transaction status:`, status.type);
+  const tx = client.tx.balances.transferKeepAlive(to, value); // prettier-end-here
 
-      if (status.type === 'Finalized') {
-        defer.resolve();
-      }
-    });
+  await tx.sign(from);
+
+  console.log('tx.signature', tx.signature);
+
+  await tx.send(async ({ status }) => {
+    console.log(`Transaction status:`, status.type);
+
+    if (status.type === 'Finalized') {
+      defer.resolve();
+    }
+  });
 
   return defer.promise;
 };
