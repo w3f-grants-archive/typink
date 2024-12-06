@@ -113,7 +113,7 @@ export const mintifyPSP22Balance = async (psp22Address: string, pair: KeyringPai
 
   const {
     raw: { gasRequired },
-  } = await contract.query.psp22MintableMint(BigInt(100 * Math.pow(10, 6)));
+  } = await contract.query.psp22MintableMint(BigInt(100 * Math.pow(10, 6)), { caller: pair.address });
 
   await contract.tx
     .psp22MintableMint(BigInt(amount * Math.pow(10, 6)), {
