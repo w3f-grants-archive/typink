@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { ALICE, deployAndDeposit, wrapper } from '../utils.js';
+import { ALICE, BOB, deployAndDeposit, wrapper } from '../utils.js';
 import { Contract } from 'dedot/contracts';
 import { Psp22ContractApi } from '../contracts/psp22';
 import * as psp22 from '../contracts/psp22.json';
@@ -39,5 +39,34 @@ describe('useContract', () => {
     expect(result.current?.data).toBeGreaterThan(0n);
 
     console.log("Current value: " + result.current.data);
+  });
+
+  it('should update balance when address changes', async () => {
+    const { result, rerender } = renderHook(({ address }) => usePSP22Balance({ contractAddress, address }), {
+      wrapper,
+      initialProps: {
+        address: ALICE,
+      },
+    });
+
+    // Wait for ALICE's balance to be fetched
+    await waitFor(() => {
+      expect(result.current.data).toBeDefined();
+    });
+
+    const aliceBalance = result.current;
+
+    rerender({ address: BOB });
+
+    // Initially, the balance should be undefined again
+    expect(result.current.data).toBeUndefined();
+
+    // Wait for BOB's balance to be fetched
+    await waitFor(() => {
+      expect(result.current.data).toBeDefined();
+    });
+
+    // BOB's balance should be different from ALICE's
+    expect(result.current.data).not.toEqual(aliceBalance);
   });
 });
