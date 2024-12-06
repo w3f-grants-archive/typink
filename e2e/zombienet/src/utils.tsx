@@ -86,20 +86,24 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
 
   const defer = deferred<string>();
 
-  await deployer.tx
-    .new(2000n, undefined, undefined, 0, { gasLimit: gasRequired, salt }) // prettier-end-here;
-    .signAndSend(alice, async ({ status, events }) => {
-      console.log('Transaction status:', status.type);
+  const tx = deployer.tx.new(2000n, undefined, undefined, 0, { gasLimit: gasRequired, salt });
 
-      if (status.type === 'BestChainBlockIncluded') {
-        const instantiatedEvent = client.events.contracts.Instantiated.find(events);
+  await tx.sign(alice);
 
-        assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
+  console.log('tx.signature', tx.signature);
 
-        const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
-        defer.resolve(contractAddress);
-      }
-    });
+  await tx.send(async ({ status, events }) => {
+    console.log('Transaction status:', status.type);
+
+    if (status.type === 'BestChainBlockIncluded') {
+      const instantiatedEvent = client.events.contracts.Instantiated.find(events);
+
+      assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
+
+      const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
+      defer.resolve(contractAddress);
+    }
+  });
 
   return defer.promise;
 };
