@@ -55,6 +55,8 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
 
   const tx = client.tx.balances.transferKeepAlive(to, value); // prettier-end-here
 
+  console.log('current nonce', await getNonce(from.address));
+
   await tx.sign(from);
 
   console.log('tx.signature', tx.signature);
@@ -91,6 +93,8 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
   const defer = deferred<string>();
 
   const tx = deployer.tx.new(2000n, undefined, undefined, 0, { gasLimit: gasRequired, salt });
+
+  console.log('current nonce', await getNonce(alice.address));
 
   await tx.sign(alice);
 
@@ -180,4 +184,22 @@ export const deployAndDeposit = async (): Promise<string> => {
   await mintifyPSP22Balance(contractAddress, bob, 200);
 
   return contractAddress;
+};
+
+const getNonce = async (signerAddress: string): Promise<number | undefined> => {
+  try {
+    return (await client.query.system.account(signerAddress)).nonce;
+  } catch (e) {
+    console.log(e);
+  }
+
+  try {
+    return await client.call.accountNonceApi.accountNonce(signerAddress);
+  } catch (e) {
+    console.log(e);
+  }
+
+  // TODO fallback to api.rpc.system_accountNextIndex if needed
+
+  return undefined;
 };
