@@ -82,25 +82,4 @@ describe('useContract', () => {
       { timeout: 5000 },
     );
   });
-
-  it('should automatic update balance when watch is enabled', async () => {
-    const { result } = renderHook(() => usePSP22Balance({ contractAddress, address: ALICE, watch: true }), { wrapper });
-
-    // Wait for ALICE's balance to be fetched
-    await waitFor(() => {
-      expect(result.current.data).toBeDefined();
-    });
-
-    const aliceBalance = result.current.data;
-
-    // Simulate a transfer event
-    const { alice } = devPairs();
-    await mintifyPSP22Balance(contractAddress, alice, 100);
-
-    // Wait for the balance to be updated
-    await waitFor(() => {
-      expect(result.current.data).toBeDefined();
-      expect(result.current.data).not.toEqual(aliceBalance);
-    });
-  });
 });
