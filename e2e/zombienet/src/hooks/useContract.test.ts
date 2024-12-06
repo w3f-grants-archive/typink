@@ -37,5 +37,7 @@ describe('useContract', () => {
     });
 
     expect(result.current?.data).toBeGreaterThan(0n);
+
+    console.log("Current value: " + result.current.data);
   });
 });
