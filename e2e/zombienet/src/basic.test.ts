@@ -18,6 +18,7 @@ describe('basic client operations', () => {
 
   it('should transfer balance successfully', async () => {
     const { alice } = devPairs();
+
     await transferNativeBalance(alice, BOB, BigInt(1e12));
   });
 });
