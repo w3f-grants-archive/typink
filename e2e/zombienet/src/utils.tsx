@@ -58,7 +58,7 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
     .signAndSend(from, async ({ status }) => {
       console.log(`Transaction status:`, status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'Finalized') {
         defer.resolve();
       }
     });
@@ -95,7 +95,7 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
   await tx.send(async ({ status, events }) => {
     console.log('Transaction status:', status.type);
 
-    if (status.type === 'BestChainBlockIncluded') {
+    if (status.type === 'Finalized') {
       const instantiatedEvent = client.events.contracts.Instantiated.find(events);
 
       assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
@@ -147,7 +147,7 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'Finalized') {
         const instantiatedEvent = client.events.contracts.Instantiated.find(events);
 
         assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
