@@ -6,10 +6,11 @@ import * as psp22 from '../contracts/psp22.json';
 
 describe('useContract', () => {
   let contract: Contract<Psp22ContractApi>;
+  let contractAddress: string;
   beforeAll(async () => {
-    const address = await deployAndDeposit();
-    console.log('Deployed contract address', address);
-    contract = new Contract(client, psp22 as any, address, { defaultCaller: ALICE });
+    contractAddress= await deployAndDeposit();
+    console.log('Deployed contract contractAddress', contractAddress);
+    contract = new Contract(client, psp22 as any, contractAddress, { defaultCaller: ALICE });
   });
 
   it('get flipper value', async () => {
@@ -17,5 +18,9 @@ describe('useContract', () => {
 
     console.log(`Initial value:`, state);
     // expect(state).toBe(true);
+  });
+
+  it('...', () => {
+    console.log(contractAddress);
   });
 });
