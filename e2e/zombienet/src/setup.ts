@@ -14,7 +14,7 @@ const getConst = (pallet: string, name: string) => {
   return undefined;
 };
 
-let firstTransfer = false;
+global.firstTransfer = false;
 
 beforeAll(async () => {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
@@ -29,15 +29,15 @@ beforeAll(async () => {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 2) {
+      if (head.number > 3) {
         resolve();
       }
     });
   });
 
-  if (!firstTransfer) {
+  if (!global.firstTransfer) {
     console.log('Trigger first transfer');
-    firstTransfer = true;
+    global.firstTransfer = true;
     const { alice } = devPairs();
     await transferNativeBalance(alice, BOB, BigInt(1e12));
   }
