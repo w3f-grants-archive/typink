@@ -26,14 +26,18 @@ export async function setup() {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 3) {
+      if (head.number > 0) {
         resolve();
       }
     });
   });
 
   console.log('Trigger first transfer');
+
   const { alice } = devPairs();
+  const account = await global.client.query.system.account(alice.address);
+  console.log('Account balance:', account);
+
   await transferNativeBalance(alice, BOB, BigInt(1e12));
 }
 
