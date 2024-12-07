@@ -72,6 +72,24 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
   return defer.promise;
 };
 
+export const transferNativeBalance2 = async (from: KeyringPair, to: string, value: bigint): Promise<void> => {
+  const defer = deferred<void>();
+
+  console.log('current nonce', await getNonce(from.address));
+
+  await client.tx.balances
+    .transferKeepAlive(to, value) // prettier-end-here
+    .signAndSend(from, async ({ status }) => {
+      console.log(`Transaction status:`, status.type);
+
+      if (status.type === 'Finalized') {
+        defer.resolve();
+      }
+    });
+
+  return defer.promise;
+};
+
 export const deployPSP22Contract = async (salt?: string): Promise<string> => {
   const { alice } = devPairs();
 

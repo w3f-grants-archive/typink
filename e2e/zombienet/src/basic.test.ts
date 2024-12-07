@@ -7,7 +7,7 @@ import {
   devPairs,
   getNonce,
   sleep,
-  transferNativeBalance,
+  transferNativeBalance, transferNativeBalance2,
   wrapper,
 } from './utils';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -40,7 +40,7 @@ it('[basic client operations] should fetch account balance', async () => {
 it('[basic client operations] should transfer balance successfully', async () => {
   const { alice } = devPairs();
 
-  await transferNativeBalance(alice, BOB, BigInt(1e12));
+  await transferNativeBalance2(alice, BOB, BigInt(1e12));
 });
 
 // it('[basic client operations] should transfer balance successfully - 2', async () => {
