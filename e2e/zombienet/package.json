@@ -3,7 +3,7 @@
   "author": "Thang Vu <thang@dedot.dev>",
   "private": true,
   "scripts": {
-    "e2e:test": "npx vitest --watch=false --no-file-parallelism --sequence.concurrent=false --sequence.hooks=list --no-isolate"
+    "e2e:test": "npx vitest --watch=false --no-file-parallelism --sequence.concurrent=false --sequence.hooks=list --no-isolate --max-concurrency=1"
   },
   "dependencies": {
     "@dedot/chaintypes": "*",
