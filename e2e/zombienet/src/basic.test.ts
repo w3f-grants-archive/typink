@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, expectTypeOf, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, expectTypeOf, it } from 'vitest';
 import { ALICE, BOB, CHARLIE, deployAndDeposit, devPairs, getNonce, transferNativeBalance, wrapper } from './utils';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useBalance, useBalances, useDeployer, useDeployerTx, usePSP22Balance } from 'typink';
@@ -9,6 +9,17 @@ import { Psp22ContractApi } from './contracts/psp22';
 import { FlipperContractApi } from './contracts/flipper';
 import * as psp22 from './contracts/psp22.json';
 import * as flipper from './contracts/flipper_v5.json';
+import { PinnedBlock } from 'dedot';
+
+afterEach(async () => {
+  return new Promise((resolve) => {
+    global.client.chainHead.on('finalizedBlock', (x: PinnedBlock) => {
+      console.log('[afterEach] Current finalized block number:', x.number);
+
+      resolve(x);
+    });
+  });
+});
 
 describe('basic client operations', () => {
   it('should get current block number', async () => {
