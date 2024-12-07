@@ -186,7 +186,7 @@ export const deployAndDeposit = async (): Promise<string> => {
   return contractAddress;
 };
 
-const getNonce = async (signerAddress: string): Promise<number | undefined> => {
+export const getNonce = async (signerAddress: string): Promise<number | undefined> => {
   try {
     return (await client.query.system.account(signerAddress)).nonce;
   } catch (e) {

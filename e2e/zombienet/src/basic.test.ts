@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, expectTypeOf, it } from 'vitest';
-import { ALICE, BOB, CHARLIE, deployAndDeposit, devPairs, transferNativeBalance, wrapper } from './utils';
+import { ALICE, BOB, CHARLIE, deployAndDeposit, devPairs, getNonce, transferNativeBalance, wrapper } from './utils';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useBalance, useBalances, useDeployer, useDeployerTx, usePSP22Balance } from 'typink';
 import { numberToHex } from 'dedot/utils';
@@ -338,7 +338,7 @@ describe('useDeployerTx', () => {
         args: [true],
         // @ts-ignore
         txOptions: { salt },
-        callback: ({ status }, contractAddress) => {
+        callback: async ({ status }, contractAddress) => {
           if (status.type === 'BestChainBlockIncluded') {
             console.log('Best chain block included');
           }
@@ -351,6 +351,7 @@ describe('useDeployerTx', () => {
     });
 
     expect(contractAddress).toBeDefined();
+    console.log('current nonce', await getNonce(ALICE));
     console.log('Contract is deployed at address', contractAddress);
   });
 });
