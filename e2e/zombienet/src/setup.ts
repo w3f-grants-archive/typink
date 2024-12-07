@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from 'vitest';
-import {DedotClient, LegacyClient, PinnedBlock, WsProvider} from 'dedot';
+import { DedotClient, WsProvider } from 'dedot';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
 
@@ -15,7 +15,7 @@ const getConst = (pallet: string, name: string) => {
 
 beforeAll(async () => {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
-  global.client = await LegacyClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
+  global.client = await DedotClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
 
   console.log('system.blockHashCount', getConst('system', 'blockHashCount'));
   console.log('babe.expectedBlockTime', getConst('babe', 'expectedBlockTime'));
