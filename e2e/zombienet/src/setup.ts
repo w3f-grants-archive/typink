@@ -1,6 +1,6 @@
 import { afterAll, beforeAll } from 'vitest';
 import { DedotClient, WsProvider } from 'dedot';
-import { BOB, devPairs, transferNativeBalance } from 'utils';
+import { BOB, devPairs, transferNativeBalance } from './utils';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
 
