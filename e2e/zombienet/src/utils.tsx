@@ -115,11 +115,19 @@ export const mintifyPSP22Balance = async (psp22Address: string, pair: KeyringPai
     raw: { gasRequired },
   } = await contract.query.psp22MintableMint(BigInt(100 * Math.pow(10, 6)), { caller: pair.address });
 
+  const defer = deferred<void>();
+
   await contract.tx
-    .psp22MintableMint(BigInt(amount * Math.pow(10, 6)), {
-      gasLimit: gasRequired,
-    })
-    .signAndSend(pair);
+    .psp22MintableMint(BigInt(amount * Math.pow(10, 6)), { gasLimit: gasRequired })
+    .signAndSend(pair, ({ status }) => {
+      console.log('Transaction status:', status.type);
+
+      if (status.type === 'BestChainBlockIncluded') {
+        defer.resolve();
+      }
+    });
+
+  return defer.promise;
 };
 
 export const deployFlipperContract = async (salt?: string): Promise<string> => {
