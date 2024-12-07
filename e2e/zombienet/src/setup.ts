@@ -1,4 +1,3 @@
-import { afterAll, beforeAll } from 'vitest';
 import { DedotClient, WsProvider } from 'dedot';
 import { BOB, devPairs, transferNativeBalance } from './utils';
 
@@ -14,9 +13,7 @@ const getConst = (pallet: string, name: string) => {
   return undefined;
 };
 
-global.firstTransfer = false;
-
-beforeAll(async () => {
+export async function setup() {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
   global.client = await DedotClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
 
@@ -35,15 +32,12 @@ beforeAll(async () => {
     });
   });
 
-  if (!global.firstTransfer) {
-    console.log('Trigger first transfer');
-    global.firstTransfer = true;
-    const { alice } = devPairs();
-    await transferNativeBalance(alice, BOB, BigInt(1e12));
-  }
-}, 300_000);
+  console.log('Trigger first transfer');
+  const { alice } = devPairs();
+  await transferNativeBalance(alice, BOB, BigInt(1e12));
+}
 
-afterAll(async () => {
+export async function teardown() {
   await global.client.disconnect();
   console.log(`Disconnected from ${CONTRACTS_NODE_ENDPOINT}`);
-});
+}

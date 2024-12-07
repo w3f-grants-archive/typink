@@ -6,7 +6,7 @@ import * as psp22 from '../contracts/psp22.json';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePSP22Balance } from 'typink';
 
-describe('usePsp22Balance', () => {
+describe('usePspBalance', () => {
   let contract: Contract<Psp22ContractApi>;
   let contractAddress: string;
   beforeAll(async () => {
