@@ -26,7 +26,7 @@ export async function setup() {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 0) {
+      if (head.number > 9) {
         resolve();
       }
     });
