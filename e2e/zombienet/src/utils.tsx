@@ -18,6 +18,8 @@ export const KEYRING = new Keyring({ type: 'sr25519' });
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 export const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 export const CHARLIE = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
+const ALICE_PAIR = KEYRING.addFromUri('//Alice');
+const BOB_PAIR = KEYRING.addFromUri('//Bob');
 
 export const flipperMetadata = parseRawMetadata(JSON.stringify(flipper));
 export const mockSigner = {
@@ -169,9 +171,7 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
 };
 
 export const devPairs = () => {
-  const alice = KEYRING.addFromUri('//Alice');
-  const bob = KEYRING.addFromUri('//Bob');
-  return { alice, bob };
+  return { alice: ALICE_PAIR, bob: BOB_PAIR };
 };
 
 export const deployAndDeposit = async (): Promise<string> => {
