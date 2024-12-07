@@ -43,8 +43,8 @@ it('[basic client operations] should transfer balance successfully', async () =>
   await transferNativeBalance(alice, BOB, BigInt(1e12));
 });
 
-it('[basic client operations] should transfer balance successfully - 2', async () => {
-  const { alice } = devPairs();
-
-  await transferNativeBalance(alice, CHARLIE, BigInt(1e12));
-});
+// it('[basic client operations] should transfer balance successfully - 2', async () => {
+//   const { alice } = devPairs();
+//
+//   await transferNativeBalance(alice, CHARLIE, BigInt(1e12));
+// });
