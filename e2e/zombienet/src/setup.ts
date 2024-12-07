@@ -23,11 +23,12 @@ beforeAll(async () => {
   console.log('aura.slotDuration', getConst('aura', 'slotDuration'));
   console.log('timestamp.minimumPeriod', getConst('timestamp', 'minimumPeriod'));
 
-  await new Promise<void>((resolve) => {
-    global.client.rpc.chain_subscribeFinalizedHeads((head) => {
+  await new Promise<void>(async (resolve) => {
+    const unsub = await global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 3) {
+      if (head.number > 1) {
+        unsub();
         resolve();
       }
     });
