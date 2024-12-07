@@ -1,3 +1,4 @@
+import { afterAll, beforeAll } from 'vitest';
 import { LegacyClient, WsProvider } from 'dedot';
 import { BOB, devPairs, transferNativeBalance } from './utils';
 
@@ -13,7 +14,7 @@ const getConst = (pallet: string, name: string) => {
   return undefined;
 };
 
-export async function setup() {
+beforeAll(async () => {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
   global.client = await LegacyClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
 
@@ -26,22 +27,21 @@ export async function setup() {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 1) {
+      if (head.number > 3) {
         resolve();
       }
     });
   });
 
-  console.log('Trigger first transfer');
+  if (!global.firstTransfer) {
+    console.log('Trigger first transfer');
+    global.firstTransfer = true;
+    const { alice } = devPairs();
+    await transferNativeBalance(alice, BOB, BigInt(1e12));
+  }
+}, 300_000);
 
-  const { alice } = devPairs();
-  const account = await global.client.query.system.account(alice.address);
-  console.log('Account balance:', account);
-
-  await transferNativeBalance(alice, BOB, BigInt(1e12));
-}
-
-export async function teardown() {
+afterAll(async () => {
   await global.client.disconnect();
   console.log(`Disconnected from ${CONTRACTS_NODE_ENDPOINT}`);
-}
+});
