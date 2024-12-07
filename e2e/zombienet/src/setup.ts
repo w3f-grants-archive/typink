@@ -1,5 +1,6 @@
 import { afterAll, beforeAll } from 'vitest';
 import { DedotClient, WsProvider } from 'dedot';
+import { BOB, devPairs, transferNativeBalance } from 'utils';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
 
@@ -13,6 +14,8 @@ const getConst = (pallet: string, name: string) => {
   return undefined;
 };
 
+let firstTransfer = false;
+
 beforeAll(async () => {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
   global.client = await DedotClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
@@ -22,7 +25,7 @@ beforeAll(async () => {
   console.log('aura.slotDuration', getConst('aura', 'slotDuration'));
   console.log('timestamp.minimumPeriod', getConst('timestamp', 'minimumPeriod'));
 
-  return new Promise<void>((resolve) => {
+  await new Promise<void>((resolve) => {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
@@ -31,6 +34,13 @@ beforeAll(async () => {
       }
     });
   });
+
+  if (!firstTransfer) {
+    console.log('Trigger first transfer');
+    firstTransfer = true;
+    const { alice } = devPairs();
+    await transferNativeBalance(alice, BOB, BigInt(1e12));
+  }
 }, 300_000);
 
 afterAll(async () => {
