@@ -1,8 +1,5 @@
 import { DedotClient, WsProvider } from 'dedot';
-import { ALICE, BOB, devPairs, transferNativeBalance, wrapper } from './utils';
-import { renderHook, waitFor } from '@testing-library/react';
-import { useBalance } from 'typink';
-import { assert } from 'dedot/utils';
+import { BOB, devPairs, transferNativeBalance } from './utils';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
 
@@ -29,20 +26,10 @@ export async function setup() {
     global.client.rpc.chain_subscribeFinalizedHeads((head) => {
       console.log('Current finalized block number:', head.number);
 
-      if (head.number > 0) {
+      if (head.number > 1) {
         resolve();
       }
     });
-  });
-
-  const { result } = renderHook(() => useBalance(ALICE), { wrapper });
-
-  // Initially, the balance should be undefined
-  assert(result.current === undefined, 'Should be undefined');
-
-  // Wait for the balance to be fetched
-  await waitFor(() => {
-    assert(result.current !== undefined, 'Should be defined');
   });
 
   console.log('Trigger first transfer');
