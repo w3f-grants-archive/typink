@@ -20,7 +20,7 @@ import * as psp22 from './contracts/psp22.json';
 import * as flipper from './contracts/flipper_v5.json';
 
 afterEach(async () => {
-  await sleep(3000);
+  await sleep(1000);
 });
 
 it('[basic client operations] should get current block number', async () => {

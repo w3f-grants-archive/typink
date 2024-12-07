@@ -61,13 +61,13 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
 
   console.log('tx.signature', tx.signature);
 
-  tx.send(async ({ status }) => {
+  await tx.send(async ({ status }) => {
     console.log(`Transaction status:`, status.type);
 
     if (status.type === 'Finalized') {
       defer.resolve();
     }
-  }).catch(console.error);
+  });
 
   return defer.promise;
 };
@@ -100,7 +100,7 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
 
   console.log('tx.signature', tx.signature);
 
-  tx.send(async ({ status, events }) => {
+  await tx.send(async ({ status, events }) => {
     console.log('Transaction status:', status.type);
 
     if (status.type === 'Finalized') {
@@ -111,7 +111,7 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
       const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
       defer.resolve(contractAddress);
     }
-  }).catch(console.error);
+  });
 
   return defer.promise;
 };
@@ -150,7 +150,7 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
 
   const defer = deferred<string>();
 
-  deployer.tx
+  await deployer.tx
     .new(true, { gasLimit: gasRequired, salt }) // prettier-end-here;
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
@@ -163,8 +163,7 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
         const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
         defer.resolve(contractAddress);
       }
-    })
-    .catch(console.error);
+    });
 
   return defer.promise;
 };
