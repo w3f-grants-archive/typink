@@ -180,8 +180,8 @@ export const deployAndDeposit = async (): Promise<string> => {
   const salt = numberToHex(Date.now());
   const contractAddress = await deployPSP22Contract(salt);
 
-  await mintifyPSP22Balance(contractAddress, alice, 100);
-  await mintifyPSP22Balance(contractAddress, bob, 200);
+  // await mintifyPSP22Balance(contractAddress, alice, 100);
+  // await mintifyPSP22Balance(contractAddress, bob, 200);
 
   return contractAddress;
 };
