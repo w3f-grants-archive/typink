@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { BOB, devPairs, transferNativeBalance } from './utils';
+import {BOB, CHARLIE, devPairs, transferNativeBalance} from './utils';
 
 describe('basic client operations', () => {
   it('should get current block number', async () => {
@@ -20,5 +20,11 @@ describe('basic client operations', () => {
     const { alice } = devPairs();
 
     await transferNativeBalance(alice, BOB, BigInt(1e12));
+  });
+
+  it('should transfer balance to charlie successfully', async () => {
+    const { alice } = devPairs();
+
+    await transferNativeBalance(alice, CHARLIE, BigInt(1e12));
   });
 });
