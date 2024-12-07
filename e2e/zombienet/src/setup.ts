@@ -2,7 +2,7 @@ import { DedotClient, WsProvider } from 'dedot';
 import { ALICE, BOB, devPairs, transferNativeBalance, wrapper } from './utils';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useBalance } from 'typink';
-import { expect } from 'vitest';
+import { assert } from 'dedot/utils';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
 
@@ -38,11 +38,11 @@ export async function setup() {
   const { result } = renderHook(() => useBalance(ALICE), { wrapper });
 
   // Initially, the balance should be undefined
-  expect(result.current).toBeUndefined();
+  assert(result.current === undefined, 'Should be undefined');
 
   // Wait for the balance to be fetched
   await waitFor(() => {
-    expect(result.current).toBeDefined();
+    assert(result.current !== undefined, 'Should be defined');
   });
 
   console.log('Trigger first transfer');
