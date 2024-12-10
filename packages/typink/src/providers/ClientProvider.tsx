@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import { useInitializeClient } from '../hooks/internal/index.js';
 import { NetworkId, NetworkInfo, Props } from '../types.js';
 import { ISubstrateClient } from 'dedot';
