@@ -18,8 +18,8 @@ export default function MainHeader() {
         gap={4}
         h={16}>
         <a href='/ui/public'>
-          <Box w={9}>
-            <img src='/dedot-dark-logo.png' />
+          <Box w={8}>
+            <img src='/typink-logo.png' />
           </Box>
         </a>
         <Flex gap={2}>{signer ? <AccountSelection /> : <WalletSelection />}</Flex>
