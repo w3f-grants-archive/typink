@@ -1,5 +1,4 @@
 import { init } from '@subwallet-connect/react';
-import ledgerPolkadot from '@subwallet-connect/ledger-polkadot';
 import talisman from '@subwallet-connect/talisman';
 import polkadotJs from '@subwallet-connect/polkadot-js';
 import subwalletPolkadot from '@subwallet-connect/subwallet-polkadot';
@@ -23,7 +22,6 @@ export const onboardWallets = init({
   // An array of wallet modules that you would like to be presented to the user to select from when connecting a wallet.
   wallets: [
     subwalletPolkadot(), // prettier-end-here
-    ledgerPolkadot(),
     talisman(),
     polkadotJs(),
   ],
