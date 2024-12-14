@@ -201,7 +201,7 @@ describe('useContractQuery', () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it('should refresh when client.query.system.number changes', async () => {
+  it('should refresh when client.query.system.number changes when watch is enabled', async () => {
     // Simulate a block number change
     mockClient.query.system.number.mockImplementation((callback) => {
       return new Promise((resolve) => {
