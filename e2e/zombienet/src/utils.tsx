@@ -82,7 +82,7 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
   // Dry-run to estimate gas fee
   const {
     raw: { gasRequired },
-  } = await deployer.query.new(2000n, undefined, undefined, 0, {
+  } = await deployer.query.new(2000n, 'USDT Coin', 'USDT', 0, {
     caller,
     salt,
   });
@@ -92,7 +92,7 @@ export const deployPSP22Contract = async (salt?: string): Promise<string> => {
   const defer = deferred<string>();
 
   await deployer.tx
-    .new(2000n, undefined, undefined, 0, { gasLimit: gasRequired, salt }) // prettier-end-here;
+    .new(2000n, 'USDT Coin', 'USDT', 0, { gasLimit: gasRequired, salt }) // prettier-end-here;
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
 
