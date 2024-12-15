@@ -40,15 +40,14 @@ export function useWatchContractEvent<
       let done = false;
       let unsub: Unsub | undefined;
 
-      unsub = sub({
-        contract,
-        //@ts-ignore
-        event,
-        callback: (events) => {
-          if (done) return;
-          //@ts-ignore
-          onNewEvent(events);
-        },
+      unsub = sub((events) => {
+        if (done) return;
+
+        const contractEvents = contract.events[event].filter(events);
+        if (contractEvents.length === 0) return;
+
+        // @ts-ignore
+        onNewEvent(contractEvents);
       });
 
       return () => {

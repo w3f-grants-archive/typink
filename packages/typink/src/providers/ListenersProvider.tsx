@@ -1,22 +1,14 @@
-import { Contract, GenericContractApi } from 'dedot/contracts';
 import { Unsub } from 'dedot/types';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { UseContractEvent } from 'src/hooks';
-import { Props } from 'src/types';
+import { Props } from '../types.js';
 import { useClient } from './ClientProvider.js';
+import type { FrameSystemEventRecord } from 'dedot/chaintypes';
 
-export type ContractEventListener<
-  T extends GenericContractApi = GenericContractApi,
-  M extends keyof UseContractEvent<T> = keyof UseContractEvent<T>,
-> = {
-  contract: Contract<T>;
-  event: M;
-  callback: (events: ReturnType<T['events'][M]['filter']>) => void;
-};
+export type EventListener = (events: FrameSystemEventRecord[]) => void;
 
 export interface ListenersContextProps {
-  sub: (listener: ContractEventListener) => Unsub | undefined;
-  listeners: ContractEventListener[];
+  sub: (listener: EventListener) => Unsub | undefined;
+  listeners: EventListener[];
 }
 
 export const ListenersContext = createContext<ListenersContextProps>({} as any);
@@ -27,7 +19,7 @@ export const useListeners = () => {
 
 export function ListenersProvider({ children }: Props) {
   const { client } = useClient();
-  const [listeners, setListeners] = useState<ContractEventListener[]>([]);
+  const [listeners, setListeners] = useState<EventListener[]>([]);
 
   useEffect(() => {
     if (!client) return;
@@ -36,12 +28,7 @@ export function ListenersProvider({ children }: Props) {
 
     (async () => {
       unsub = await client.query.system.events((events) => {
-        listeners.forEach((listener) => {
-          const contractEvents = listener.contract.events[listener.event].filter(events);
-          if (contractEvents.length === 0) return;
-
-          listener.callback(contractEvents);
-        });
+        listeners.forEach((callback) => callback(events));
       });
     })();
 
@@ -50,7 +37,7 @@ export function ListenersProvider({ children }: Props) {
     };
   }, [client, listeners]);
 
-  const sub = (listener: ContractEventListener): Unsub | undefined => {
+  const sub = (listener: EventListener): Unsub | undefined => {
     if (!client) {
       return;
     }
