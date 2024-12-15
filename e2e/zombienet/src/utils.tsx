@@ -50,6 +50,8 @@ export const wrapper = ({ children }: Props) => (
 );
 
 export const transferNativeBalance = async (from: KeyringPair, to: string, value: bigint): Promise<void> => {
+  console.log('[transferNativeBalance]');
+
   const defer = deferred<void>();
   await logNonce(from.address);
 
