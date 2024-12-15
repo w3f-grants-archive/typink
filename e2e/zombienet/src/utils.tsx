@@ -52,6 +52,7 @@ export const wrapper = ({ children }: Props) => (
 
 export const transferNativeBalance = async (from: KeyringPair, to: string, value: bigint): Promise<void> => {
   const defer = deferred<void>();
+  await logNonce(from.address);
 
   await client.tx.balances
     .transferKeepAlive(to, value) // prettier-end-here
