@@ -19,4 +19,11 @@ describe('useContract2', () => {
     console.log(`Total supply`, state);
     expect(state).toBeDefined();
   });
+
+  it('get balance of', async () => {
+    const { data: state } = await contract.query.psp22BalanceOf(ALICE);
+
+    console.log(`balance of alice`, state);
+    expect(state).toBeDefined();
+  });
 });
