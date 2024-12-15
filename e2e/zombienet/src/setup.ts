@@ -19,10 +19,12 @@ beforeAll(async () => {
   });
 
   if (!global.initialTransfer) {
+    console.log('initial transfer started');
     global.initialTransfer = true;
 
     const { alice } = devPairs();
     await transferNativeBalance(alice, BOB, BigInt(1e12));
+    console.log('initial transfer done');
   }
 }, 240_000);
 
