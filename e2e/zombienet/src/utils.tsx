@@ -18,8 +18,8 @@ export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 export const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 export const CHARLIE = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
 
-export const flipperMetadata = parseRawMetadata(JSON.stringify(flipper));
-export const psp22Metadata = parseRawMetadata(JSON.stringify(psp22));
+export const flipperMetadata = flipper;
+export const psp22Metadata = psp22;
 
 export const mockSigner = {
   signPayload: async (payloadJSON: SignerPayloadJSON) => {
