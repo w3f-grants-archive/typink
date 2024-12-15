@@ -13990,7 +13990,7 @@ __metadata:
   dependencies:
     "@dedot/chaintypes": "npm:^0.44.0"
     "@polkadot/keyring": "npm:^13.2.3"
-    "@polkadot/types": "npm:^15.0.1"
+    "@polkadot/types": "npm:^13.2.3"
     "@polkadot/util-crypto": "npm:^13.2.3"
     dedot: "npm:^0.6.1"
     happy-dom: "npm:^15.11.7"
