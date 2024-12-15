@@ -1,8 +1,11 @@
 import { development, InjectedSigner, Props, SignerPayloadJSON, TypinkProvider } from 'typink';
 import Keyring from '@polkadot/keyring';
 import { FlipperContractApi } from './contracts/flipper';
+import { Psp22ContractApi } from './contracts/psp22';
 // @ts-ignore
 import * as flipper from './contracts/flipper_v5.json';
+// @ts-ignore
+import * as psp22 from './contracts/psp22.json';
 import { ContractDeployer, parseRawMetadata } from 'dedot/contracts';
 import { assert, deferred } from 'dedot/utils';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
@@ -16,6 +19,8 @@ export const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 export const CHARLIE = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
 
 export const flipperMetadata = parseRawMetadata(JSON.stringify(flipper));
+export const psp22Metadata = parseRawMetadata(JSON.stringify(psp22));
+
 export const mockSigner = {
   signPayload: async (payloadJSON: SignerPayloadJSON) => {
     const { alice } = devPairs();
@@ -63,12 +68,13 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
 };
 
 export const deployFlipperContract = async (salt?: string): Promise<string> => {
+  console.log('[deployFlipperContract]');
   const { alice } = devPairs();
 
   const caller = alice.address;
 
   const wasm = flipper.source.wasm!;
-  const deployer = new ContractDeployer<FlipperContractApi>(client, flipper as any, wasm);
+  const deployer = new ContractDeployer<FlipperContractApi>(client, flipperMetadata, wasm);
 
   // Dry-run to estimate gas fee
   const {
@@ -84,6 +90,45 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
 
   await deployer.tx
     .new(true, { gasLimit: gasRequired, salt }) // prettier-end-here;
+    .signAndSend(alice, async ({ status, events }) => {
+      console.log('Transaction status:', status.type);
+
+      if (status.type === 'BestChainBlockIncluded') {
+        const instantiatedEvent = client.events.contracts.Instantiated.find(events);
+
+        assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
+
+        const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
+        defer.resolve(contractAddress);
+      }
+    });
+
+  return defer.promise;
+};
+
+export const deployPsp22Contract = async (salt?: string): Promise<string> => {
+  console.log('[deployPsp22Contract]');
+  const { alice } = devPairs();
+
+  const caller = alice.address;
+
+  const wasm = flipper.source.wasm!;
+  const deployer = new ContractDeployer<Psp22ContractApi>(client, psp22Metadata, wasm);
+
+  // Dry-run to estimate gas fee
+  const {
+    raw: { gasRequired },
+  } = await deployer.query.new(BigInt(1e20), 'PSP Token Name', 'PSPT', 10, {
+    caller,
+    salt,
+  });
+
+  console.log('Estimated gas required: ', gasRequired);
+
+  const defer = deferred<string>();
+
+  await deployer.tx
+    .new(BigInt(1e20), 'PSP Token Name', 'PSPT', 10, { gasLimit: gasRequired, salt }) // prettier-end-here;
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
 
