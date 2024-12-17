@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from 'vitest';
-import { DedotClient, PinnedBlock, WsProvider } from 'dedot';
+import { LegacyClient, WsProvider } from 'dedot';
 import { BOB, devPairs, transferNativeBalance } from './utils';
 
 const CONTRACTS_NODE_ENDPOINT = 'ws://127.0.0.1:9944';
@@ -29,17 +29,18 @@ const kickOff = async () => {
 
 beforeAll(async () => {
   console.log(`Connect to ${CONTRACTS_NODE_ENDPOINT}`);
-  global.client = await DedotClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
+  const client = await LegacyClient.new(new WsProvider(CONTRACTS_NODE_ENDPOINT));
 
-  await new Promise((resolve) => {
-    global.client.chainHead.on('finalizedBlock', (x: PinnedBlock) => {
-      console.log('Current finalized block number:', x.number);
-
-      if (x.number > 2) {
-        resolve(x);
+  await new Promise<void>(async (resolve) => {
+    const unsub = await client.rpc.chain_subscribeFinalizedHeads((head) => {
+      if (head.number > 2) {
+        unsub();
+        resolve();
       }
     });
   });
+
+  global.client = client;
 
   // await kickOff();
 }, 300_000);
