@@ -13,6 +13,7 @@ const kickOff = async () => {
 
   while (true) {
     const nonce = (await client.query.system.account(alice.address)).nonce;
+    console.log('current none', nonce);
     if (nonce > 0) {
       break;
     }
@@ -21,7 +22,7 @@ const kickOff = async () => {
       await transferNativeBalance(alice, BOB, BigInt(1e12));
     } catch (e) {
       console.log(e);
-      await sleep(1000);
+      await sleep(5000);
     }
   }
 };
