@@ -6,7 +6,7 @@ import { Psp22ContractApi } from './contracts/psp22';
 import * as flipper from './contracts/flipper_v5.json';
 // @ts-ignore
 import * as psp22 from './contracts/psp22.json';
-import { ContractDeployer, parseRawMetadata } from 'dedot/contracts';
+import { ContractDeployer, ContractMetadata } from 'dedot/contracts';
 import { assert, deferred } from 'dedot/utils';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types';
@@ -18,8 +18,8 @@ export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 export const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 export const CHARLIE = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y';
 
-export const flipperMetadata = flipper;
-export const psp22Metadata = psp22;
+export const flipperMetadata = flipper as ContractMetadata;
+export const psp22Metadata = psp22 as ContractMetadata;
 
 export const mockSigner = {
   signPayload: async (payloadJSON: SignerPayloadJSON) => {
@@ -112,7 +112,7 @@ export const deployPsp22Contract = async (salt?: string): Promise<string> => {
 
   const caller = alice.address;
 
-  const wasm = flipper.source.wasm!;
+  const wasm = psp22Metadata.source.wasm!;
   const deployer = new ContractDeployer<Psp22ContractApi>(client, psp22Metadata, wasm);
 
   // Dry-run to estimate gas fee
