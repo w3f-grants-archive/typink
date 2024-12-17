@@ -35,7 +35,7 @@ beforeAll(async () => {
     global.client.chainHead.on('finalizedBlock', (x: PinnedBlock) => {
       console.log('Current finalized block number:', x.number);
 
-      if (x.number > 0) {
+      if (x.number > 2) {
         resolve(x);
       }
     });
