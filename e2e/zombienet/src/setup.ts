@@ -33,7 +33,7 @@ beforeAll(async () => {
 
   await new Promise<void>(async (resolve) => {
     const unsub = await client.rpc.chain_subscribeFinalizedHeads((head) => {
-      if (head.number > 2) {
+      if (head.number > 10) {
         unsub();
         resolve();
       }
