@@ -41,7 +41,7 @@ beforeAll(async () => {
     });
   });
 
-  await kickOff();
+  // await kickOff();
 }, 300_000);
 
 afterAll(async () => {
