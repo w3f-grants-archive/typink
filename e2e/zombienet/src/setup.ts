@@ -13,7 +13,7 @@ const kickOff = async () => {
 
   while (true) {
     const nonce = (await client.query.system.account(alice.address)).nonce;
-    console.log('current none', nonce);
+    console.log('current nonce', nonce);
     if (nonce > 0) {
       break;
     }
@@ -22,7 +22,7 @@ const kickOff = async () => {
       await transferNativeBalance(alice, BOB, BigInt(1e12));
     } catch (e) {
       console.log(e);
-      await sleep(5000);
+      await sleep(10_000);
     }
   }
 };
@@ -35,7 +35,7 @@ beforeAll(async () => {
     global.client.chainHead.on('finalizedBlock', (x: PinnedBlock) => {
       console.log('Current finalized block number:', x.number);
 
-      if (x.number > 2) {
+      if (x.number > 9) {
         resolve(x);
       }
     });
