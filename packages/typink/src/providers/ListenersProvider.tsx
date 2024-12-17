@@ -17,6 +17,13 @@ export const useListeners = () => {
   return useContext(ListenersContext);
 };
 
+/**
+ * ListenersProvider is a React component that manages event listeners for system events.
+ * It provides a context for subscribing to and managing event listeners.
+ *
+ * @param props - The component props.
+ * @param props.children - The child components to be wrapped by the provider.
+ */
 export function ListenersProvider({ children }: Props) {
   const { client } = useClient();
   const [listeners, setListeners] = useState<EventListener[]>([]);
@@ -37,6 +44,12 @@ export function ListenersProvider({ children }: Props) {
     };
   }, [client, listeners]);
 
+  /**
+   * Subscribes a new event listener to the system events.
+   *
+   * @param {EventListener} listener - The event listener function to be added.
+   * @returns {Unsub | undefined} A function to unsubscribe the listener, or undefined if there's no client.
+   */
   const sub = (listener: EventListener): Unsub | undefined => {
     if (!client) {
       return;
