@@ -112,7 +112,7 @@ export const deployPsp22Contract = async (salt?: string): Promise<string> => {
 
   const caller = alice.address;
 
-  const wasm = flipper.source.wasm!;
+  const wasm = psp22Metadata.source.wasm!;
   const deployer = new ContractDeployer<Psp22ContractApi>(client, psp22Metadata, wasm);
 
   // Dry-run to estimate gas fee
