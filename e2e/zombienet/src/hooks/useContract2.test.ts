@@ -1,8 +1,10 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { ALICE, deployPsp22Contract, psp22Metadata } from '../utils';
+import { ALICE, deployPsp22Contract, psp22Metadata, wrapper } from '../utils';
 import { numberToHex } from 'dedot/utils';
 import { Contract } from 'dedot/contracts';
 import { Psp22ContractApi } from '../contracts/psp22';
+import { renderHook, waitFor } from '@testing-library/react';
+import { usePSP22Balance } from 'typink';
 
 describe('useContract2', () => {
   let contract: Contract<Psp22ContractApi>;
@@ -25,5 +27,20 @@ describe('useContract2', () => {
 
     console.log(`alice balance`, state);
     expect(state).toBeDefined();
+  });
+
+  it('should load balance properly', async () => {
+    const { result } = renderHook(
+      () => usePSP22Balance({ contractAddress: contract.address.address(), address: ALICE }), // prettier-end-here
+      { wrapper },
+    );
+
+    expect(result.current.data).toBeUndefined();
+
+    await waitFor(() => {
+      expect(result.current.data).toBeDefined();
+    });
+
+    expect(result.current.data).toBeGreaterThan(0n);
   });
 });
