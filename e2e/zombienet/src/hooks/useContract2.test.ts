@@ -38,10 +38,8 @@ describe('useContract2', () => {
     expect(result.current.data).toBeUndefined();
 
     await waitFor(() => {
-      expect(result.current.data).toBeDefined();
+      expect(result.current.data).toBe(BigInt(1e20));
     });
-
-    expect(result.current.data).toBeGreaterThan(BigInt(1e20));
   });
 
   it('should update balance when address changes', async () => {
