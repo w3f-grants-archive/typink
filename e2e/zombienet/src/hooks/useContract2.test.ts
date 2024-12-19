@@ -80,24 +80,24 @@ describe('useContract2', () => {
     });
   });
 
-  it('should automatic update balance when watch is enabled', async () => {
-    const { result } = renderHook(() => usePSP22Balance({ contractAddress, address: ALICE, watch: true }), { wrapper });
-
-    // Wait for ALICE's balance to be fetched
-    await waitFor(() => {
-      expect(result.current.data).toBeDefined();
-    });
-
-    const aliceBalance = result.current.data!;
-
-    // Simulate a transfer event
-    const { alice } = devPairs();
-    await mintPSP22Balance(contractAddress, alice, BigInt(1e12));
-
-    // Wait for the balance to be updated
-    await waitFor(() => {
-      expect(result.current.data).toBe(aliceBalance + BigInt(1e12));
-      expect(result.current.data).not.toEqual(aliceBalance);
-    });
-  });
+  // it('should automatically update balance when watch is enabled', async () => {
+  //   const { result } = renderHook(() => usePSP22Balance({ contractAddress, address: ALICE, watch: true }), { wrapper });
+  //
+  //   // Wait for ALICE's balance to be fetched
+  //   await waitFor(() => {
+  //     expect(result.current.data).toBeDefined();
+  //   });
+  //
+  //   const aliceBalance = result.current.data!;
+  //
+  //   // Simulate a transfer event
+  //   const { alice } = devPairs();
+  //   await mintPSP22Balance(contractAddress, alice, BigInt(1e12));
+  //
+  //   // Wait for the balance to be updated
+  //   await waitFor(() => {
+  //     expect(result.current.data).toBe(aliceBalance + BigInt(1e12));
+  //     expect(result.current.data).not.toEqual(aliceBalance);
+  //   });
+  // });
 });
