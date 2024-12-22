@@ -93,6 +93,7 @@ export function useContractTx<
           });
         } catch (e) {
           console.error(e);
+          throw e;
         } finally {
           setInProgress(false);
           setInBestBlockProgress(false);

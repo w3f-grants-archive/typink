@@ -28,12 +28,9 @@ describe('useContractQuery', () => {
   });
 
   it('should dry run successfully', async () => {
-    const { result } = renderHook(
-      () => useContractQuery({ contract, fn: 'psp22Transfer', args: [BOB, BigInt(1e12), '0x'] }),
-      {
-        wrapper,
-      },
-    );
+    const { result } = renderHook(() => useContractQuery({ contract, fn: 'psp22MintableMint', args: [BigInt(1e12)] }), {
+      wrapper,
+    });
 
     expect(result.current.data).toBeUndefined();
 
