@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { ALICE, BOB, deployPsp22Contract, psp22Metadata, wrapper } from '../utils';
+import { ALICE, BOB, deployPsp22Contract, devPairs, mintPSP22Balance, psp22Metadata, wrapper } from '../utils';
 import { numberToHex } from 'dedot/utils';
 import { Contract } from 'dedot/contracts';
 import { Psp22ContractApi } from '../contracts/psp22';
@@ -69,5 +69,26 @@ describe('useContract2', () => {
 
     // BOB's balance should be different from ALICE's
     expect(result.current.data).not.toEqual(aliceBalance);
+  });
+
+  it('should automatic update balance when watch is enabled', async () => {
+    const { result } = renderHook(() => usePSP22Balance({ contractAddress, address: ALICE, watch: true }), { wrapper });
+
+    // Wait for ALICE's balance to be fetched
+    await waitFor(() => {
+      expect(result.current.data).toBeDefined();
+    });
+
+    const aliceBalance = result.current.data;
+
+    // Simulate a transfer event
+    const { alice } = devPairs();
+    await mintPSP22Balance(contractAddress, alice, BigInt(1e12));
+
+    // Wait for the balance to be updated
+    await waitFor(() => {
+      expect(result.current.data).toBe(BigInt(1e20) + BigInt(1e12));
+      expect(result.current.data).not.toEqual(aliceBalance);
+    });
   });
 });

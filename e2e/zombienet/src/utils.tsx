@@ -6,7 +6,7 @@ import { Psp22ContractApi } from './contracts/psp22';
 import * as flipper from './contracts/flipper_v5.json';
 // @ts-ignore
 import * as psp22 from './contracts/psp22.json';
-import { ContractDeployer, parseRawMetadata } from 'dedot/contracts';
+import { Contract, ContractDeployer, parseRawMetadata } from 'dedot/contracts';
 import { assert, deferred } from 'dedot/utils';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from '@polkadot/keyring/types';
@@ -139,6 +139,29 @@ export const deployPsp22Contract = async (salt?: string): Promise<string> => {
 
         const contractAddress = instantiatedEvent.palletEvent.data.contract.address();
         defer.resolve(contractAddress);
+      }
+    });
+
+  return defer.promise;
+};
+
+export const mintPSP22Balance = async (psp22Address: string, pair: KeyringPair, amount: bigint): Promise<void> => {
+  console.log('[mintPSP22Balance]', psp22Address, pair.address, amount);
+
+  const contract = new Contract<Psp22ContractApi>(client, psp22Metadata, psp22Address, { defaultCaller: pair.address });
+
+  const {
+    raw: { gasRequired },
+  } = await contract.query.psp22MintableMint(amount);
+
+  const defer = deferred<void>();
+  await contract.tx
+    .psp22MintableMint(amount, { gasLimit: gasRequired }) // prettier-end-here
+    .signAndSend(pair, ({ status }) => {
+      console.log('Transaction status:', status.type);
+
+      if (status.type === 'BestChainBlockIncluded') {
+        defer.resolve();
       }
     });
 
