@@ -59,7 +59,7 @@ export const transferNativeBalance = async (from: KeyringPair, to: string, value
     .signAndSend(from, async ({ status }) => {
       console.log(`Transaction status:`, status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'BestChainBlockIncluded' || status.type === 'Finalized') {
         defer.resolve();
       }
     });
@@ -93,7 +93,7 @@ export const deployFlipperContract = async (salt?: string): Promise<string> => {
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'BestChainBlockIncluded' || status.type === 'Finalized') {
         const instantiatedEvent = client.events.contracts.Instantiated.find(events);
 
         assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
@@ -132,7 +132,7 @@ export const deployPsp22Contract = async (salt?: string): Promise<string> => {
     .signAndSend(alice, async ({ status, events }) => {
       console.log('Transaction status:', status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'BestChainBlockIncluded' || status.type === 'Finalized') {
         const instantiatedEvent = client.events.contracts.Instantiated.find(events);
 
         assert(instantiatedEvent, 'Event Contracts.Instantiated should be available');
@@ -160,7 +160,7 @@ export const mintPSP22Balance = async (psp22Address: string, pair: KeyringPair, 
     .signAndSend(pair, ({ status }) => {
       console.log('Transaction status:', status.type);
 
-      if (status.type === 'BestChainBlockIncluded') {
+      if (status.type === 'BestChainBlockIncluded' || status.type === 'Finalized') {
         defer.resolve();
       }
     });
