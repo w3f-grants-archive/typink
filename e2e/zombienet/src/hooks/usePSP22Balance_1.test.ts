@@ -4,7 +4,7 @@ import { numberToHex } from 'dedot/utils';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePSP22Balance } from 'typink';
 
-describe('useContract2', () => {
+describe('usePSP22Balance_1', () => {
   let contractAddress: string;
   beforeAll(async () => {
     const randomSalt = numberToHex(Date.now());
