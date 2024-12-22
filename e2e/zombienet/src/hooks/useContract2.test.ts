@@ -1,18 +1,24 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { ALICE, deployPsp22Contract, devPairs, mintPSP22Balance, psp22Metadata, wrapper } from '../utils';
+import { ALICE, deployPsp22Contract, devPairs, mintPSP22Balance, wrapper } from '../utils';
 import { numberToHex } from 'dedot/utils';
-import { Contract } from 'dedot/contracts';
-import { Psp22ContractApi } from '../contracts/psp22';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePSP22Balance } from 'typink';
 
 describe('useContract2', () => {
-  let contractAddress: string, contract: Contract<Psp22ContractApi>;
+  let contractAddress: string;
   beforeAll(async () => {
     const randomSalt = numberToHex(Date.now());
     contractAddress = await deployPsp22Contract(randomSalt);
     console.log('Deployed contract address', contractAddress);
-    contract = new Contract<Psp22ContractApi>(client, psp22Metadata, contractAddress, { defaultCaller: ALICE });
+  });
+
+  it('should return undefined for invalid address', async () => {
+    const { result } = renderHook(() => usePSP22Balance({ contractAddress, address: 'invalid_address' }), { wrapper });
+
+    // The balance should remain undefined
+    await waitFor(() => {
+      expect(result.current.data).toBeUndefined();
+    });
   });
 
   it('should automatic update balance when watch is enabled', async () => {
