@@ -75,4 +75,84 @@ describe('useBalance', () => {
     expect(typeof result.current?.reserved).toBe('bigint');
     expect(typeof result.current?.frozen).toBe('bigint');
   });
+
+  it('should return correct balance properties 2', async () => {
+    const { result } = renderHook(() => useBalance(ALICE), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined();
+    });
+
+    expect(result.current).toHaveProperty('free');
+    expect(result.current).toHaveProperty('reserved');
+    expect(result.current).toHaveProperty('frozen');
+
+    expect(typeof result.current?.free).toBe('bigint');
+    expect(typeof result.current?.reserved).toBe('bigint');
+    expect(typeof result.current?.frozen).toBe('bigint');
+  });
+
+  it('should return correct balance properties 3', async () => {
+    const { result } = renderHook(() => useBalance(ALICE), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined();
+    });
+
+    expect(result.current).toHaveProperty('free');
+    expect(result.current).toHaveProperty('reserved');
+    expect(result.current).toHaveProperty('frozen');
+
+    expect(typeof result.current?.free).toBe('bigint');
+    expect(typeof result.current?.reserved).toBe('bigint');
+    expect(typeof result.current?.frozen).toBe('bigint');
+  });
+
+  it('should return correct balance properties 4', async () => {
+    const { result } = renderHook(() => useBalance(ALICE), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined();
+    });
+
+    expect(result.current).toHaveProperty('free');
+    expect(result.current).toHaveProperty('reserved');
+    expect(result.current).toHaveProperty('frozen');
+
+    expect(typeof result.current?.free).toBe('bigint');
+    expect(typeof result.current?.reserved).toBe('bigint');
+    expect(typeof result.current?.frozen).toBe('bigint');
+  });
+
+  it('should return correct balance properties 5', async () => {
+    const { result } = renderHook(() => useBalance(ALICE), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined();
+    });
+
+    expect(result.current).toHaveProperty('free');
+    expect(result.current).toHaveProperty('reserved');
+    expect(result.current).toHaveProperty('frozen');
+
+    expect(typeof result.current?.free).toBe('bigint');
+    expect(typeof result.current?.reserved).toBe('bigint');
+    expect(typeof result.current?.frozen).toBe('bigint');
+  });
+
+  it('should return correct balance properties 6', async () => {
+    const { result } = renderHook(() => useBalance(ALICE), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined();
+    });
+
+    expect(result.current).toHaveProperty('free');
+    expect(result.current).toHaveProperty('reserved');
+    expect(result.current).toHaveProperty('frozen');
+
+    expect(typeof result.current?.free).toBe('bigint');
+    expect(typeof result.current?.reserved).toBe('bigint');
+    expect(typeof result.current?.frozen).toBe('bigint');
+  });
 });
