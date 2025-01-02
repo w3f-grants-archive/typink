@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from 'react-use';
-import { useIsFirstRender, useWallets } from '../hooks/index.js';
+import { useDeepDeps, useIsFirstRender } from '../hooks/index.js';
 import { InjectedAccount, InjectedSigner } from '../types.js';
-import { Wallet } from '../wallets/index.js';
+import { polkadotjs, subwallet, talisman, Wallet } from '../wallets/index.js';
 import { assert } from 'dedot/utils';
 import { noop } from '../utils/index.js';
 import { WalletProvider, WalletProviderProps } from './WalletProvider.js';
@@ -14,6 +14,7 @@ export interface WalletSetupContextProps {
   disconnect: () => void;
   connectedWalletId?: string;
   connectedWallet?: Wallet;
+  wallets: Wallet[]; // custom available wallets
 
   setConnectedAccount: (account: InjectedAccount) => void;
   accounts: InjectedAccount[];
@@ -24,13 +25,18 @@ export const WalletSetupContext = createContext<WalletSetupContextProps>({
   connectWallet: noop,
   disconnect: noop,
   setConnectedAccount: noop,
+  wallets: [],
 });
 
 export const useWalletSetup = () => {
   return useContext(WalletSetupContext);
 };
 
-export interface WalletSetupProviderProps extends WalletProviderProps {}
+export interface WalletSetupProviderProps extends WalletProviderProps {
+  wallets?: Wallet[];
+}
+
+const DEFAULT_WALLETS: Wallet[] = [subwallet, talisman, polkadotjs];
 
 /**
  * WalletSetupProvider is a component that manages wallet setup and connection state.
@@ -45,8 +51,9 @@ export function WalletSetupProvider({
   children,
   signer: initialSigner,
   connectedAccount: initialConnectedAccount,
+  wallets: initialWallets,
 }: WalletSetupProviderProps) {
-  const { wallets } = useWallets();
+  const wallets = useMemo(() => initialWallets || DEFAULT_WALLETS, useDeepDeps([initialWallets]));
   const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
 
   const [connectedWalletId, setConnectedWalletId, removeConnectedWalletId] =
@@ -81,28 +88,41 @@ export function WalletSetupProvider({
     let unsub: () => void;
 
     (async () => {
-      const targetWallet: Wallet = getWallet(connectedWalletId);
+      try {
+        const targetWallet: Wallet = getWallet(connectedWalletId);
 
-      assert(targetWallet, `Wallet Id Not Found ${connectedWalletId}`);
+        assert(targetWallet, `Wallet Id Not Found ${connectedWalletId}`);
 
-      await targetWallet.waitUntilReady();
-      const injectedProvider = targetWallet.injectedProvider;
+        await targetWallet.waitUntilReady();
+        const injectedProvider = targetWallet.injectedProvider;
 
-      assert(injectedProvider?.enable, `Invalid Wallet: ${targetWallet.id}`);
+        assert(injectedProvider?.enable, `Invalid Wallet: ${targetWallet.id}`);
 
-      const injected = await injectedProvider.enable('Sample Dapp');
+        // TODO customize dapp name?
+        const injected = await injectedProvider.enable('Sample Dapp');
+        const initialConnectedAccounts = await injected.accounts.get();
 
-      // reset accounts on wallet changing
-      setAccounts([]);
+        // TODO keep track of wallet decision?
+        if (initialConnectedAccounts.length === 0) {
+          removeConnectedWalletId();
+          return;
+        }
 
-      // only remove the connected account if we're switching to a different wallet
-      if (!isFirstRender) {
-        removeConnectedAccount();
+        // reset accounts on wallet changing
+        setAccounts([]);
+
+        // only remove the connected account if we're switching to a different wallet
+        if (!isFirstRender) {
+          removeConnectedAccount();
+        }
+
+        unsub = injected.accounts.subscribe(setAccounts);
+
+        setSigner(injected.signer as any);
+      } catch (e) {
+        console.error('Error while connecting wallet:', e);
+        removeConnectedWalletId();
       }
-
-      unsub = injected.accounts.subscribe(setAccounts);
-
-      setSigner(injected.signer as any);
     })();
 
     return () => unsub && unsub();
@@ -128,6 +148,7 @@ export function WalletSetupProvider({
         connectedWalletId,
         connectedWallet,
         setConnectedAccount,
+        wallets,
       }}>
       <WalletProvider signer={signer} connectedAccount={connectedAccount}>
         {children}
