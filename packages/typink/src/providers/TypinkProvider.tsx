@@ -8,8 +8,13 @@ import {
   WalletSetupProvider,
   WalletSetupProviderProps,
 } from './WalletSetupProvider.js';
+import { TypinkEventsContextProps, TypinkEventsProvider, useTypinkEvents } from './TypinkEventsProvider.js';
 
-export interface TypinkContextProps extends ClientContextProps, WalletSetupContextProps, WalletContextProps {
+export interface TypinkContextProps
+  extends ClientContextProps,
+    WalletSetupContextProps,
+    WalletContextProps,
+    TypinkEventsContextProps {
   deployments: ContractDeployment[];
   defaultCaller: SubstrateAddress; // TODO validate substrate address
 }
@@ -21,14 +26,24 @@ export interface TypinkProviderProps extends ClientProviderProps, WalletSetupPro
   defaultCaller: SubstrateAddress;
 }
 
-function TypinkProviderInner({ children, deployments, defaultCaller }: TypinkProviderProps) {
+export type TypinkProviderInnerProps = Omit<TypinkProviderProps, 'appName'>
+
+function TypinkProviderInner({ children, deployments, defaultCaller }: TypinkProviderInnerProps) {
   const clientContext = useClient();
   const walletSetupContext = useWalletSetup();
   const walletContext = useWallet();
+  const typinkEventsContext = useTypinkEvents();
 
   return (
     <TypinkContext.Provider
-      value={{ ...clientContext, ...walletSetupContext, ...walletContext, deployments, defaultCaller }}>
+      value={{
+        ...typinkEventsContext,
+        ...clientContext,
+        ...walletSetupContext,
+        ...walletContext,
+        deployments,
+        defaultCaller,
+      }}>
       {children}
     </TypinkContext.Provider>
   );
@@ -65,16 +80,20 @@ export function TypinkProvider({
   supportedNetworks,
   signer,
   connectedAccount,
+  wallets,
+  appName,
 }: TypinkProviderProps) {
   return (
-    <WalletSetupProvider signer={signer} connectedAccount={connectedAccount}>
+    <WalletSetupProvider signer={signer} connectedAccount={connectedAccount} wallets={wallets} appName={appName}>
       <ClientProvider
         defaultNetworkId={defaultNetworkId}
         cacheMetadata={cacheMetadata}
         supportedNetworks={supportedNetworks}>
-        <TypinkProviderInner deployments={deployments} defaultCaller={defaultCaller}>
-          {children}
-        </TypinkProviderInner>
+        <TypinkEventsProvider>
+          <TypinkProviderInner deployments={deployments} defaultCaller={defaultCaller}>
+            {children}
+          </TypinkProviderInner>
+        </TypinkEventsProvider>
       </ClientProvider>
     </WalletSetupProvider>
   );

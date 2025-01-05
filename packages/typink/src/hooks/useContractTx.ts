@@ -91,6 +91,9 @@ export function useContractTx<
             txOptions,
             callback,
           });
+        } catch (e) {
+          console.error(e);
+          throw e;
         } finally {
           setInProgress(false);
           setInBestBlockProgress(false);

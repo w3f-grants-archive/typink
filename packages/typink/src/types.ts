@@ -35,7 +35,6 @@ export interface NetworkInfo {
   name: string;
   logo: string;
   provider: string;
-  prefix: number;
   symbol: string;
   decimals: number;
   subscanUrl?: string;
