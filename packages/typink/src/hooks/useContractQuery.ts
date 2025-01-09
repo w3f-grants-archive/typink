@@ -14,7 +14,7 @@ type UseContractQueryReturnType<
   M extends keyof ContractQuery<T> = keyof ContractQuery<T>,
 > = {
   isLoading: boolean;
-  refresh: () => void;
+  refresh: () => Promise<void>;
   isRefreshing: boolean;
   error?: Error;
 } & Partial<Awaited<ReturnType<T['query'][M]>>>;
@@ -50,8 +50,8 @@ export function useContractQuery<
   } & Args<Pop<Parameters<T['query'][M]>>>,
 ): UseContractQueryReturnType<T, M> {
   // TODO replace loading tracking state with tanstack
-  
-  const { client } = useTypink(); 
+
+  const { client } = useTypink();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -151,4 +151,3 @@ export function useContractQuery<
     error,
   } as any;
 }
-
