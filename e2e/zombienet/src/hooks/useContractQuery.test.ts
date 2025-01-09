@@ -15,16 +15,42 @@ describe('useContractQuery', () => {
     contract = new Contract<Psp22ContractApi>(client, psp22Metadata, contractAddress, { defaultCaller: ALICE });
   });
 
-  it('should load total supply', async () => {
-    const { result } = renderHook(() => useContractQuery({ contract, fn: 'psp22TotalSupply' }), {
+  it('should work probably', async () => {
+    const { result: totalSupply } = renderHook(() => useContractQuery({ contract, fn: 'psp22TotalSupply' }), {
       wrapper,
     });
 
-    expect(result.current.data).toBeUndefined();
+    expect(totalSupply.current.data).toBeUndefined();
+    expect(totalSupply.current.isLoading).toEqual(true);
+    expect(totalSupply.current.isRefreshing).toEqual(false);
 
     await waitFor(() => {
-      expect(result.current.data).toBe(BigInt(1e20));
+      expect(totalSupply.current.data).toEqual(BigInt(1e20));
+      expect(totalSupply.current.isLoading).toEqual(false);
     });
+
+    totalSupply.current.refresh();
+
+    await waitFor(() => {
+      expect(totalSupply.current.isRefreshing).toEqual(true);
+    });
+
+    await waitFor(() => {
+      expect(totalSupply.current.data).toEqual(BigInt(1e20));
+      expect(totalSupply.current.isRefreshing).toEqual(false);
+    });
+
+    const { result: balanceOf } = renderHook(
+      () => useContractQuery({ contract, args: ['0x_FAKE_'], fn: 'psp22BalanceOf' }),
+      {
+        wrapper,
+      },
+    );
+    await waitFor(() => {
+      expect(balanceOf.current.error).toBeDefined();
+    });
+
+    console.log('Error:', balanceOf.current.error);
   });
 
   it('should dry run successfully', async () => {
@@ -92,7 +118,7 @@ describe('useContractQuery', () => {
       },
       { timeout: 12000 },
     );
-    
+
     console.log('After transfer:', balanceOf.current.data);
   });
 
