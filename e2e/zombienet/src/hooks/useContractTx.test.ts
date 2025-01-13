@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { BOB, deployPsp22Contract, psp22Metadata, wrapper } from '../utils';
+import { BOB, deployPsp22Contract, flipperMetadata, psp22Metadata, wrapper } from '../utils';
 import { numberToHex } from 'dedot/utils';
 import { renderHook, waitFor } from '@testing-library/react';
-import { TypinkError, useContractTx, useRawContract } from 'typink';
+import { useContractTx, useRawContract } from 'typink';
 import { Psp22ContractApi } from 'contracts/psp22';
+import { FlipperContractApi } from '../contracts/flipper';
 
 describe('useContractTx', () => {
   let contractAddress: string;
@@ -81,6 +82,32 @@ describe('useContractTx', () => {
       result.current.signAndSend({
         args: [BOB, BigInt(1e30), '0x'],
       }),
-    ).rejects.toThrowError(new TypinkError(JSON.stringify({ type: 'InsufficientBalance' })));
+    ).rejects.toThrowError('Contract Message Error: InsufficientBalance');
+  });
+
+  it('should throw a lang error for invalid input', async () => {
+    const { result: rawContract } = renderHook(
+      () => useRawContract<FlipperContractApi>(flipperMetadata, contractAddress),
+      {
+        wrapper,
+      },
+    );
+
+    await waitFor(() => {
+      expect(rawContract.current.contract).toBeDefined();
+      expect(rawContract.current.contract?.client.options.signer).toBeDefined();
+    });
+
+    const contract = rawContract.current.contract;
+
+    const { result } = renderHook(() => useContractTx(contract, 'flip'), {
+      wrapper,
+    });
+
+    expect(result.current.signAndSend).toBeDefined();
+
+    expect(result.current.signAndSend({})).rejects.toThrowError(
+      'Contract Language Error: Invalid message input or unavailable contract message.',
+    );
   });
 });

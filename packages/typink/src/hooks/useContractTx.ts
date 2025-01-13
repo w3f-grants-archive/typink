@@ -1,17 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useTypink } from './useTypink.js';
 import { Args, OmitNever, Pop } from '../types.js';
-import {
-  Contract,
-  ContractCallOptions,
-  ContractTxOptions,
-  GenericContractApi,
-  isContractDispatchError,
-} from 'dedot/contracts';
+import { Contract, ContractCallOptions, ContractTxOptions, GenericContractApi } from 'dedot/contracts';
 import { ISubmittableResult } from 'dedot/types';
 import { assert, deferred } from 'dedot/utils';
-import { TypinkError } from '../utils/index.js';
+import { ContractMessageError, withReadableErrorMessage } from '../utils/index.js';
 import { useDeepDeps } from './internal/index.js';
+import { checkBalanceSufficiency } from '../helpers/index.js';
 
 type UseContractTx<A extends GenericContractApi = GenericContractApi> = OmitNever<{
   [K in keyof A['tx']]: K extends string ? (K extends `${infer Literal}` ? Literal : never) : never;
@@ -63,8 +58,8 @@ export function useContractTx<
   const signAndSend = useMemo(
     () => {
       return async (o: Parameters<UseContractTxReturnType<T>['signAndSend']>[0]) => {
-        assert(contract, 'Contract Not Found');
-        assert(connectedAccount, 'Connected Account Not Found');
+        assert(contract, 'Contract not found');
+        assert(connectedAccount, 'No connected account. Please connect your wallet.');
 
         setInProgress(true);
         setInBestBlockProgress(true);
@@ -122,18 +117,15 @@ export async function contractTx<
     callback?: (result: ISubmittableResult) => void;
   } & Args<Pop<Parameters<T['tx'][M]>>>,
 ): Promise<void> {
-  // TODO assertions
-  // TODO check if balance is sufficient
-
   const defer = deferred<void>();
 
   const signAndSend = async () => {
     const { contract, fn, args = [], caller, txOptions = {}, callback } = parameters;
 
-    try {
-      // TODO dry running
-      const dryRunOptions: ContractCallOptions = { caller };
+    await checkBalanceSufficiency(contract.client, caller);
 
+    try {
+      const dryRunOptions: ContractCallOptions = { caller };
       const dryRun = await contract.query[fn](...args, dryRunOptions);
       console.log('Dry run result:', dryRun);
 
@@ -143,8 +135,7 @@ export async function contractTx<
       } = dryRun;
 
       if (data && data['isErr'] && data['err']) {
-        // TODO Add a specific contract level error
-        throw new TypinkError(JSON.stringify(data['err']));
+        throw new ContractMessageError(data['err']);
       }
 
       const actualTxOptions: ContractTxOptions = {
@@ -164,14 +155,7 @@ export async function contractTx<
         }
       });
     } catch (e: any) {
-      if (isContractDispatchError(e) && e.dispatchError.type === 'Module') {
-        const moduleError = contract.client.registry.findErrorMeta(e.dispatchError);
-        if (moduleError) {
-          e.message = moduleError.docs.join('');
-        }
-      }
-
-      throw e;
+      throw withReadableErrorMessage(contract.client, e);
     }
   };
 
