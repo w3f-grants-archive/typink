@@ -5,15 +5,13 @@ import PendingText from '@/components/shared/PendingText.tsx';
 import { shortenAddress } from '@/utils/string.ts';
 import { ContractId } from 'contracts/deployments';
 import { GreeterContractApi } from 'contracts/types/greeter';
-import { useBalance, useContract, useContractQuery, useContractTx, useTypink, useWatchContractEvent } from 'typink';
+import { useContract, useContractQuery, useContractTx, useWatchContractEvent } from 'typink';
 import { txToaster } from '@/utils/txToaster.tsx';
 
 export default function GreetBoard() {
-  const { connectedAccount } = useTypink();
   const { contract } = useContract<GreeterContractApi>(ContractId.GREETER);
   const [message, setMessage] = useState('');
   const setMessageTx = useContractTx(contract, 'setMessage');
-  const balance = useBalance(connectedAccount?.address);
 
   const { data: greet, isLoading } = useContractQuery({
     contract,
@@ -23,16 +21,6 @@ export default function GreetBoard() {
 
   const handleUpdateGreeting = async () => {
     if (!contract || !message) return;
-
-    if (!connectedAccount) {
-      toast.info('Please connect to your wallet');
-      return;
-    }
-
-    if (balance?.free === 0n) {
-      toast.error('Balance insufficient to make transaction.');
-      return;
-    }
 
     const toaster = txToaster('Signing transaction...');
 
