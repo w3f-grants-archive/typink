@@ -120,4 +120,17 @@ describe('useContractQuery', () => {
       expect(result.current.data?.err).toEqual({ type: 'InsufficientBalance' });
     });
   });
+
+  it('should define error when errors occured', async () => {
+    const { result: balanceOf } = renderHook(
+      () => useContractQuery({ contract, args: ['0x__FAKE'], fn: 'psp22BalanceOf' }),
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(balanceOf.current.error).toBeDefined();
+    });
+
+    console.log('Error:', balanceOf.current.error);
+  });
 });
