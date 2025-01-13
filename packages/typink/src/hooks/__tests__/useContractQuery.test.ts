@@ -135,9 +135,14 @@ describe('useContractQuery', () => {
     expect(contract.query.testFunction).toHaveBeenCalledTimes(3);
   });
 
-  it('should handle errors from the contract query', async () => {
-    const testError = new Error('Test error');
-    contract.query.testFunction.mockRejectedValue(testError);
+  it('should update refresh state when refresh function is called', async () => {
+    contract.query.testFunction.mockImplementation(() => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ data: 'test result' });
+        }, 100);
+      });
+    });
 
     const { result } = renderHook(() =>
       useContractQuery({
@@ -147,14 +152,39 @@ describe('useContractQuery', () => {
       }),
     );
 
+    expect(result.current.isRefreshing).toBe(false);
+
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      result.current.refresh();
     });
 
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.error).toBe(testError);
-    expect(result.current.data).toBeUndefined();
-  });
+    expect(result.current.isRefreshing).toBe(true);
+
+    await waitFor(() => {
+      expect(result.current.isRefreshing).toBe(false);
+      expect(result.current.data).toBe('test result');
+    });
+  }),
+    it('should handle errors from the contract query', async () => {
+      const testError = new Error('Test error');
+      contract.query.testFunction.mockRejectedValue(testError);
+
+      const { result } = renderHook(() =>
+        useContractQuery({
+          contract,
+          // @ts-ignore
+          fn: 'testFunction',
+        }),
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBe(testError);
+      expect(result.current.data).toBeUndefined();
+    });
 
   it('should reset error state on successful query after an error', async () => {
     const testError = new Error('Test error');
