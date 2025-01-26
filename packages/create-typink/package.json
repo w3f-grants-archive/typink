@@ -1,0 +1,31 @@
+{
+  "name": "create-typink",
+  "version": "0.0.0",
+  "author": "Tung Vu <tung@dedot.dev>",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json && cp -R ./bin ./dist && cp -R ./src/templates ./dist",
+    "clean": "rm -rf ./dist && rm -rf ./tsconfig.tsbuildinfo ./tsconfig.build.tsbuildinfo"
+  },
+  "bin": "./bin/create-typink.mjs",
+  "dependencies": {
+    "arg": "^5.0.2",
+    "chalk": "^5.4.1",
+    "ejs": "^3.1.10",
+    "execa": "^9.5.2",
+    "inquirer": "^12.3.2",
+    "listr2": "^8.2.5",
+    "prettier": "^3.4.2",
+    "validate-npm-package-name": "^6.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/ejs": "^3",
+    "@types/validate-npm-package-name": "^4.0.2"
+  }
+}
