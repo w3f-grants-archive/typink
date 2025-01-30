@@ -24,6 +24,7 @@ Typesafe react hooks to interact with [ink!](https://use.ink/) smart contracts p
 ### Features
 - Fully typesafe react hooks at contract messages & events level
 - Choose your favorite wallet connector (Built-in Typink Connector, [SubConnect](https://github.com/Koniverse/SubConnect-v2), [Talisman Connect](https://github.com/TalismanSociety/talisman-connect), or build your own connector ...)
+- Start a new project from scratch easily with `create-typink` cli.
 - Support multiple networks, lazily initialize when in-use.
 - ... and more to come
 
@@ -42,18 +43,27 @@ pnpm add typink dedot
 
 Typink heavily uses Typescript to enable & ensure type-safety, so we recommend using Typescript for your Dapp project. Typink will also work with plain Javascript, but you don't get the auto-completion & suggestions when interacting with your ink! contracts.
 
+### Start a new project from scratch
+#### Generate new project via `create-typink` cli
+
+Typink comes with a cli to help you start a new project from scratch faster & easier, to create a new project, run the below command:
+
+```ssh
+npx create-typink@latest
+```
+
+Following the instructions, the cli will help you generate a starter & working project ready for you can start integrate your own contracts and build your own logic:
+
+<img width="1919" alt="new-typink-project" src="https://github.com/user-attachments/assets/b10b1366-f97b-41a7-b3e9-97ceb1bd0748" />
+
+
+#### Project folder structure
+- `contracts`: ink! contract artifacts & generated types
+  - `contracts/artifacts`: ink! contract artifacts (.wasm, .json or .contract file)
+  - `contracts/types`: Typescript bindings for each ink! contract, these can be generated through [`dedot` cli](#2-generate-typescript-bindings-types-for-your-ink-contracts-from-the-metadata)
+- `ui`: Main UI project, a React-based client
+
 ### Configure your project
-
-> [!NOTE]
->
-> **Starting a new project from scratch?**
->
-> Try out the prerelease of typink dapp template: https://github.com/dedotdev/typink-dapp-template.
->
-> Clone the repo & have fun!
-
-
-
 #### 1. Deploy your contracts and setup contract deployments
 
 Typink needs to know your contract deployments information (address, metadata, ...) to help you do the magic under the hood.
