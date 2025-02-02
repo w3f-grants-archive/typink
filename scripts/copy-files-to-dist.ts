@@ -15,7 +15,7 @@ const main = () => {
     let filePath = path.resolve(currentDir, file);
 
     // Copy the root README.md if current dir
-    if (file === 'README.md') {
+    if (currentDir.endsWith('packages/typink') && file === 'README.md') {
       filePath = path.resolve(currentDir, '../..', file);
     }
 
