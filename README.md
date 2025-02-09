@@ -395,3 +395,7 @@ formatBalance(1e12, popTestnet); // 100 PAS
 ### Acknowledgements
 
 Funded by W3F
+
+<p align="left">
+  <img width="250" src="https://user-images.githubusercontent.com/6867026/227230786-0796214a-3e3f-42af-94e9-d4122c730b62.png">
+</p>
