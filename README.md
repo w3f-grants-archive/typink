@@ -27,6 +27,11 @@ Typesafe React hooks for seamless [ink!](https://use.ink/) smart contract intera
 - Support multiple networks, lazily initialize when in-use.
 - ... and more to come
 
+### Quick look
+
+![typink-suggestions](https://github.com/user-attachments/assets/6a9f623a-ef77-459a-9854-6ec026a67042)
+
+
 ### Getting started
 
 ```shell
