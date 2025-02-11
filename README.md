@@ -52,7 +52,7 @@ Typink heavily uses Typescript to enable & ensure type-safety, so we recommend u
 
 Typink comes with a cli to help you start a new project from scratch faster & easier, to create a new project, run the below command:
 
-```ssh
+```shell
 npx create-typink@latest
 ```
 
@@ -63,6 +63,19 @@ npx create-typink@latest
 Following the instructions, the cli will help you generate a starter & working project ready for you to start integrate your own contracts and build your own logic:
 
 <img width="1919" alt="new-typink-project" src="https://github.com/user-attachments/assets/b10b1366-f97b-41a7-b3e9-97ceb1bd0748" />
+
+<br/>
+After initialize the project, you can now spin up the development server with the following command:
+
+```shell
+cd my-ink-dapp # project folder
+
+yarn start
+```
+
+> [!IMPORTANT]
+> Please note that `yarn` is the current default package manager for the start project, make sure to [install `yarn`](https://yarnpkg.com/getting-started/install) on your machine to streamline the development process.
+
 
 #### Project folder structure
 - `contracts`: ink! contract artifacts & generated types
